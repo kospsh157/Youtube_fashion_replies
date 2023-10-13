@@ -24,13 +24,40 @@ def getReply(video_id, api_key):
         "maxResults": 100,
     }
 
-    response = requests.get(URL, params)
-    data = response.json()
+    data = None
 
-    # 댓글은 가상 상위의 댓글만 가져온다 대댓글은 가져오지 않는다.
+    try:
+        response = requests.get(URL, params)
+        data = response.json()
+    except requests.RequestException as e:
+        print(f"API 요청 중 오류 발생: {e}")
+
+    # 댓글은 가장 상위의 댓글만 가져온다 대댓글은 가져오지 않는다.
     topReplys = []
-    for item in data['items']:
-        comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
-        topReplys.append(comment)
 
+    try:
+        if 'items' in data:
+            for item in data['items']:
+                comment = item['snippet']['topLevelComment']['snippet']['textDisplay']
+                topReplys.append(comment)
+        else:
+            print("items 키가 응답에 없습니다. 다음 원인을 확인하세요:")
+            if 'error' in data:
+                if "disabled comments" in data['error']['message']:
+                    print('해당 비디오는 댓글이 중지된 비디오임')
+                    return "댓글이 중지된 비디오"
+                else:
+                    print(data['error']['message'])
+            else:
+                print(data)
+
+    except Exception as e:
+        print('에러 발생')
+        print(e)
+
+    print('해당 영상의 댓글 총 개수:', len(topReplys))
     return topReplys
+
+
+# API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
+# print(getReply('e4yWqRNVZCo', API_KEY))

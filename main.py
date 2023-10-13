@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
+from getReply import getReply
 '''
 구글api는 한번 쿼리를 날리면 500개의 검색결과를 찾는다. 이 수는 500개로 정해져있다. 
 날짜 파라미터를 사용해서 여러번 호출하면 데이터를 모을 수 있다. 
@@ -24,11 +24,60 @@ channel_ids = ["UCkinYTS9IHqOEwR1Sze2JTw", "UCF8AeLlUbEpKju6v1H6p8Eg", "UCcQTRi6
 
 API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
 # CHANNEL_ID = 'UCF8AeLlUbEpKju6v1H6p8Eg'  # 원하는 채널의 ID
-CHANNEL_IDS = ["UCkinYTS9IHqOEwR1Sze2JTw",
-               "UCF8AeLlUbEpKju6v1H6p8Eg"]  # 여러 채널 ID를 리스트로 추가
+# CHANNEL_IDS = ["UCkinYTS9IHqOEwR1Sze2JTw",
+#                "UCF8AeLlUbEpKju6v1H6p8Eg"]  # 여러 채널 ID를 리스트로 추가
+
+# 46개의 패션 관련 채널 구독자 10만 이상인 것들.
+CHANNEL_IDS = [
+    "UCexnMWt_GyyAIkLCn7x36nw",
+    "UCepVy23t8l-CEaASZzfo9Jg",
+    "UCJdZej-O_M69bB4M6aiiLcw",
+    "UCsxzAjngTaa3bzhF5VgMybQ",
+    "UCfeNRv3gLc0nnlzDQCs-qvw",
+    "UCbjUWryxheN2M1wwYMnXkXQ",
+    "UC9vu2JsuE7g-1r9HkYkOopw",
+    "UClcbTwyRmlOINYXTcNfhdEA",
+    "UCsx0mj4acFcXoH75kOl-WEA",
+    "UCc0byt-rLHB2i15jw-QjXWg",
+    "UCs0dIu9USYQnSyPcekI8Y6A",
+    "UCkCGSs3q66MSkVyOOqKCK1g",
+    "UCbOwqHbQf0uspeRe7lY8e6Q",
+    "UCzYB6YA5f-Tc7GQcIese7pg",
+    "UC8a6z7i9qypp9PqJ_0HhBrw",
+    "UCXXlcPH1stsP3VwYG90s4wg",
+    "UCV-U1crQo6iW7F-7xsuUnFg",
+    "UCw-kXdzxMdMdLNI0ZlFFbmA",
+    "UCSrRZH9QT6li5PIAv0r_6QA",
+    "UCXe53j9Mq0rAWmbIzOMF9fw",
+    "UCr6kh7Iujsdqdqo_rp_sKrA",
+    "UC9gW47NqzI1x7e8qsflvUUw",
+    "UC79CxOQz8FQB4w5iHWEjJtQ",
+    "UCmncNwwVVXvTH4oYIxODxMQ",
+    "UCcRTcy_GuofiJLPLMlVcGxw",
+    "UCKWv0ScT6PpZcpg7ivUVWLA",
+    "UC6VzIz8tJLnetS79VbsHPGg",
+    "UCAAvO0ehWox1bbym3rXKBZw",
+    "UCkPp7PMd1sOcsJCq8_3-1fw",
+    "UCnQRkIhRmXrxGrK4-8n-lVw",
+    "UCygs-_iDpCJOnhuCZibK7JQ",
+    "UCarjMZCmwGZWZwshJXDnA5w",
+    "UC2NFRq9s2neD_Ml0tPhNC2Q",
+    "UCWWsxlEwvznz4Fwq4O5UVMg",
+    "UC0z8bddfRBRBmEC-AjI6UXw",
+    "UCKakHCcjubWyoM3P85iazoA",
+    "UCT8l_qvhkgTBu8-7wz1hZ0Q",
+    "UCVIZWeFmvOhCjJy4tZqertw",
+    "UClN5EsofXLP_SJae9WuzD0A",
+    "UCO78BQwAIG-pEfhgJEt-VRQ",
+    "UCsYWsulNo5XcYkj4e0Nc6CQ",
+    "UCG5bAssl2H0wjLG4BEv5ScQ",
+    "UCEO1HvzguBU7Foh_GvgzePw",
+    "UC8_wgZy23gjTNVQeyfwl92g",
+    "UCXVfodmlGhUpLREncSjuYAw"
+]
 
 
-SEARCH_KEYWORD = '한국'
+SEARCH_KEYWORD = '가을'
 MAX_RESULTS = 50  # 한 번의 요청으로 가져올 수 있는 최대 결과 수
 
 
@@ -42,10 +91,12 @@ VIDEOS_ENDPOINT = 'https://www.googleapis.com/youtube/v3/videos'
 
 total_request_cnt = 0
 
-start_date = "2021-01-01T00:00:00Z"
-end_date = "2021-01-31T23:59:59Z"
+start_date = "2023-09-01T00:00:00Z"
+end_date = "2023-09-30T23:59:59Z"
 start_date_obj = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
 all_video_data = []
+
+# video_id가 업데이트가 안되고 있음.
 
 for channel_id in CHANNEL_IDS:
     print('channel_id:', channel_id)
@@ -73,9 +124,12 @@ for channel_id in CHANNEL_IDS:
         search_data = search_response.json()
 
         total_results = search_data["pageInfo"]["totalResults"]
-        print(f'한번 videoID호출에서 받아온 ID들: {total_results} ')
 
+        # search_data['items']가 0이면 관련 비디오 영상이 없다는 뜻이다.
         video_ids = [item['id']['videoId'] for item in search_data['items']]
+
+        if len(search_data['items']) == 0:
+            print('지금 검색으로는 영상이 없음')
 
         # Fetch video details using video IDs
         videos_params = {
@@ -86,15 +140,18 @@ for channel_id in CHANNEL_IDS:
         videos_response = requests.get(VIDEOS_ENDPOINT, params=videos_params)
         all_video_data.extend(videos_response.json()['items'])
 
+        # 해당 비디오에 대한 댓글들도 가져오기
+        for idx, video_item in enumerate(all_video_data):
+            video_id = video_item['id']  # 또는 올바른 키 경로를 사용하여 video ID를 가져옵니다.
+            reply = getReply(video_id, API_KEY)
+            all_video_data[idx]['replys'] = reply
+
         # Get the next page token
         next_page_token = search_data.get('nextPageToken')
 
         if not next_page_token:
             print('@@@@@@@@@@@@일주일치가 끝났으니 다음 일주일으로 넘어가자@@@@@@@@@@@@@@@.')
-            print(all_video_data)
-
             start_date_obj = next_date_obj
-
             end_date_obj = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%SZ")
             if start_date_obj >= end_date_obj:
                 break
@@ -103,6 +160,12 @@ for channel_id in CHANNEL_IDS:
 # publishedAt 문자열을 datetime 객체로 변환하는 함수
 def convert_to_datetime(published_str):
     return datetime.strptime(published_str, '%Y-%m-%dT%H:%M:%SZ')
+
+
+# 확인
+# print('아래 데이터 내용 있는지 확인')
+# print(all_video_data)
+# print(len(all_video_data))
 
 
 # publishedAt 기준으로 오름차순 정렬
@@ -117,6 +180,7 @@ for item in sorted_video_data:
     likes = item['statistics'].get('likeCount', 0)
     dislikes = item['statistics'].get('dislikeCount', 0)
     comments = item['statistics'].get('commentCount', 0)
+    replys = item['replys']
 
     print(f"Title: {title}")
     print(f"Published At: {published_at}")
@@ -124,6 +188,7 @@ for item in sorted_video_data:
     print(f"Likes: {likes}")
     print(f"Dislikes: {dislikes}")
     print(f"Comments: {comments}")
+    print(f"Replys: {replys}")
     print("="*50)
 
 

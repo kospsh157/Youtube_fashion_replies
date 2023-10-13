@@ -13,14 +13,6 @@ DATABASE = {
 connection = psycopg2.connect(**DATABASE)
 cursor = connection.cursor()
 
-# 테이블 생성 (예제용)
-cursor.execute("""
-    CREATE TABLE IF NOT EXISTS my_table (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        age INTEGER
-    )
-""")
 connection.commit()
 
 # 데이터 삽입
@@ -32,3 +24,16 @@ connection.commit()
 # 연결 종료
 cursor.close()
 connection.close()
+
+
+'''
+    비디오_id,
+    제목,
+    채널명,
+    채널_아이디,
+    댓글,
+    시청수,
+    좋아요,
+    싫어요
+
+'''
