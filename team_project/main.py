@@ -1,5 +1,3 @@
-
-
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -8,7 +6,8 @@ import shutil
 import numpy as np
 
 
-base_dir = 'DogEmotion'
+
+base_dir = 'output_folder'
 emotions = ['angry', 'happy', 'relaxed', 'sad']
 
 train_dir = os.path.join(base_dir, 'train')
@@ -51,10 +50,10 @@ for emotion in emotions:
 
 
 # 데이터 경로 설정
-base_dir = 'DogEmotion'
+base_dir = 'output_folder'
 train_data_dir = os.path.join(base_dir, 'train')
 validation_data_dir = os.path.join(base_dir, 'validation')
-img_width, img_height = 150, 150
+# img_width, img_height = 150, 150
 batch_size = 32
 
 
@@ -66,18 +65,19 @@ test_datagen = ImageDataGenerator(rescale=1. / 255)
 
 train_generator = train_datagen.flow_from_directory(
     train_data_dir,
-    target_size=(img_width, img_height),
+    # target_size=(img_width, img_height),
     batch_size=batch_size,
     class_mode='categorical')
 
 validation_generator = test_datagen.flow_from_directory(
     validation_data_dir,
-    target_size=(img_width, img_height),
+    # target_size=(img_width, img_height),
     batch_size=batch_size,
     class_mode='categorical')
 
 
-
+sample_images, sample_labels = next(train_generator)
+print("Loaded image shape:", sample_images[0].shape)
 
 
 
@@ -86,9 +86,12 @@ import datetime as dt
 
 # 모델 구축
 model = Sequential()
+
+
+
 # 첫 번째 Convolutional 레이어
 model.add(Conv2D(16, (3, 3), activation='relu',
-          input_shape=(img_width, img_height, 3)))
+          input_shape=(256, 256, 3)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 # 두 번째 Convolutional 레이어

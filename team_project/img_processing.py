@@ -30,36 +30,51 @@ RGB, HSV, Grayscale 등 다양한 색상 공간으로 이미지를 변환하여 
 # 해당 폴더에 알아서 넣는다.
 # 다만 train 폴더에서 실행해야 하고 그 다음 또 validation 폴더 가서 다시한번 실행해줘야 한다.
 
-base_dir = 'DogEmotion/train'
-emotions = ['angry', 'happy', 'sad', 'relaxed']
-for emotion in emotions:
-    img_folder = os.path.join(base_dir, emotion)
-    image_names = os.listdir(img_folder)
+def processingFunc(base_dir_path, effect_name, effectFunc):
+    base_dir = base_dir_path
+    emotions = ['angry', 'happy', 'sad', 'relaxed']
 
-    for img in image_names:
-        one_img_path = os.path.join(base_dir, emotion, img)
-        print(one_img_path)
-        img_obj = cv2.imread(one_img_path)
+    for emotion in emotions:
+        img_folder = os.path.join(base_dir, emotion)
+        image_names = os.listdir(img_folder)
 
-        # 여기서 이미지에 처리할 것들 하고
-        # 지금 현재는 리사이징
-        output_img = cv2.resize(img_obj, (350, 350))
+        for img in image_names:
+            one_img_path = os.path.join(base_dir, emotion, img)
+            img_obj = cv2.imread(one_img_path)
 
-        # 출력 폴더 생성
-        output_folder = os.path.join(base_dir, 'output_folder')
-        if not os.path.exists(output_folder):
-            os.makedirs(output_folder)
+            # 여기서 이미지에 처리할 것들 하고
+            # 지금 현재는 리사이징
+            # output_img = cv2.resize(img_obj, (350, 350))
+            effected_img = effectFunc(img_obj)
 
-        # 해당 이모션 폴더 만들고
-        emotion_folder = os.path.join(output_folder, emotion)
-        if not os.path.exists(emotion_folder):
-            os.makedirs(emotion_folder)
+            # 출력 폴더 생성
+            if not os.path.exists("output_folder"):
+                os.makedirs("output_folder")
 
-        # output_img = cv2.
-        # 파일 이름 만들어줘야함.
-        # img는 원본 이미지 파일의 파일이름임.
-        file_name = img + 'resizing' + ".jpg"
-        print(emotion_folder + file_name)
-        # cv2.imwrite(os.path.join(emotion_folder, file_name), output_img)
-        if not cv2.imwrite(os.path.join(emotion_folder, file_name), output_img):
-            print("Failed to save image!")
+            # 해당 이모션 폴더 만들고
+            emotion_folder = os.path.join("output_folder", emotion)
+            if not os.path.exists(emotion_folder):
+                os.makedirs(emotion_folder)
+
+            # output_img = cv2.
+            # 파일 이름 만들어줘야함.
+            # img는 원본 이미지 파일의 파일이름임.
+            without_ext_name = os.path.splitext(img)[0]  # 확장자를 제외한 파일 이름만 가져옵니다.
+            file_ext = os.path.splitext(img)[1]
+            file_name = without_ext_name + '_' + effect_name + file_ext 
+            print(file_name)
+
+            # cv2.imwrite(os.path.join(emotion_folder, file_name), output_img)
+            if not cv2.imwrite(os.path.join(emotion_folder, file_name), effected_img):
+                print("Failed to save image!")
+          
+
+
+def effectFunc(img):
+    # type what to do to original images here
+    return cv2.resize(img, (176, 176))
+    
+
+
+
+processingFunc("DogEmotion", "resize", effectFunc)
