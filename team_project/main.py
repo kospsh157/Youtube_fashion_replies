@@ -119,5 +119,14 @@ model.fit(
 time1 = time.time()
 
 print(time1 - time2)
-dt_object = dt.datetime.fromtimestamp(time1 - time2)
-print("Readable Time:", dt_object)
+
+
+
+time2 = time.time()
+# Evaluate fucntion
+# 모델 성능 평가
+loss, accuracy = model.evaluate(validation_generator)
+print(f"Test Loss: {loss:.4f}")
+print(f"Test Accuracy: {accuracy:.4f}")
+time1 = time.time()
+print(time1 - time2)
