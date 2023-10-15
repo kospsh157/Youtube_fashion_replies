@@ -1,6 +1,6 @@
 import os
 import cv2
-
+import numpy as np
 
 '''
 크기 조정 (Resizing):
@@ -69,12 +69,21 @@ def processingFunc(base_dir_path, effect_name, effectFunc):
                 print("Failed to save image!")
           
 
-
-def effectFunc(img):
+# resize img
+def resize_func(img):
     # type what to do to original images here
-    return cv2.resize(img, (176, 176))
+    return cv2.resize(img, (384, 384))
     
 
+# rotate img
+def random_rotateFunc(img):
+    rows, cols = img.shape[:2]
+    random_angle = np.random.randint(10, 351)
+    M = cv2.getRotationMatrix2D((cols/2, rows/2), random_angle, 1)
+    return cv2.warpAffine(img, M, (cols,rows))
 
 
-processingFunc("DogEmotion", "resize", effectFunc)
+def filterFunc(img):
+    return cv2.Canny(img, 30, 70)
+
+processingFunc("DogEmotion", "ced_filter", filterFunc)

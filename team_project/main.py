@@ -7,6 +7,7 @@ import numpy as np
 
 
 
+
 base_dir = 'output_folder'
 emotions = ['angry', 'happy', 'relaxed', 'sad']
 
@@ -53,31 +54,33 @@ for emotion in emotions:
 base_dir = 'output_folder'
 train_data_dir = os.path.join(base_dir, 'train')
 validation_data_dir = os.path.join(base_dir, 'validation')
-# img_width, img_height = 150, 150
+img_width, img_height = 200, 200
 batch_size = 32
 
 
 
 
 # 이미지 데이터 전처리
+
 train_datagen = ImageDataGenerator(rescale=1. / 255)
 test_datagen = ImageDataGenerator(rescale=1. / 255)
 
 train_generator = train_datagen.flow_from_directory(
     train_data_dir,
-    # target_size=(img_width, img_height),
+    target_size=(img_width, img_height),
+    # color_mode='grayscale',  # 흑백 이미지로 로드
     batch_size=batch_size,
     class_mode='categorical')
 
 validation_generator = test_datagen.flow_from_directory(
     validation_data_dir,
-    # target_size=(img_width, img_height),
+    target_size=(img_width, img_height),
+    # color_mode='grayscale',  # 흑백 이미지로 로드
     batch_size=batch_size,
     class_mode='categorical')
 
 
-sample_images, sample_labels = next(train_generator)
-print("Loaded image shape:", sample_images[0].shape)
+
 
 
 
@@ -91,7 +94,7 @@ model = Sequential()
 
 # 첫 번째 Convolutional 레이어
 model.add(Conv2D(16, (3, 3), activation='relu',
-          input_shape=(256, 256, 3)))
+          input_shape=(img_width, img_height, 3)))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 # 두 번째 Convolutional 레이어
@@ -109,19 +112,18 @@ model.compile(loss='categorical_crossentropy',
               optimizer='adam',
               metrics=['accuracy'])
 
+
+
 # 모델 학습
-epochs = 20
-
-
+epochs = 15
 time2 = time.time()
 model.fit(
     train_generator,
     epochs=epochs,
     validation_data=validation_generator)
-
 time1 = time.time()
 
-print(time1 - time2)
+print(f'Learning time: {time1 - time2}')
 
 
 
