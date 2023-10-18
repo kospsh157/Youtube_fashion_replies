@@ -25,10 +25,7 @@ RGB, HSV, Grayscale 등 다양한 색상 공간으로 이미지를 변환하여 
 케라스의 ImageDataGenerator 사용하기
 
 '''
-# 애초에 train 폴더에서 시작한다는 것 주의 ...
-# 여기서 밑에 부분에 resize 함수 말고 딴거 처리할 코드를 넣으면  output_folder 만들어 지고 자동으로 감정 폴더 만들어
-# 해당 폴더에 알아서 넣는다.
-# 다만 train 폴더에서 실행해야 하고 그 다음 또 validation 폴더 가서 다시한번 실행해줘야 한다.
+
 
 def processingFunc(base_dir_path, effect_name, effectFunc):
     base_dir = base_dir_path
@@ -36,8 +33,11 @@ def processingFunc(base_dir_path, effect_name, effectFunc):
 
     for emotion in emotions:
         img_folder = os.path.join(base_dir, emotion)
+
+        print(img_folder)
         image_names = os.listdir(img_folder)
 
+        print(image_names)
         for img in image_names:
             one_img_path = os.path.join(base_dir, emotion, img)
             img_obj = cv2.imread(one_img_path)
@@ -59,31 +59,39 @@ def processingFunc(base_dir_path, effect_name, effectFunc):
             # output_img = cv2.
             # 파일 이름 만들어줘야함.
             # img는 원본 이미지 파일의 파일이름임.
-            without_ext_name = os.path.splitext(img)[0]  # 확장자를 제외한 파일 이름만 가져옵니다.
+            # 확장자를 제외한 파일 이름만 가져옵니다.
+            without_ext_name = os.path.splitext(img)[0]
             file_ext = os.path.splitext(img)[1]
-            file_name = without_ext_name + '_' + effect_name + file_ext 
+            file_name = without_ext_name + '_' + effect_name + file_ext
             print(file_name)
 
             # cv2.imwrite(os.path.join(emotion_folder, file_name), output_img)
             if not cv2.imwrite(os.path.join(emotion_folder, file_name), effected_img):
                 print("Failed to save image!")
-          
+
 
 # resize img
 def resize_func(img):
     # type what to do to original images here
     return cv2.resize(img, (384, 384))
-    
+
 
 # rotate img
 def random_rotateFunc(img):
     rows, cols = img.shape[:2]
-    random_angle = np.random.randint(10, 351)
+    random_angle = np.random.randint(1, 36) * 10
     M = cv2.getRotationMatrix2D((cols/2, rows/2), random_angle, 1)
-    return cv2.warpAffine(img, M, (cols,rows))
+    return cv2.warpAffine(img, M, (cols, rows))
 
 
 def filterFunc(img):
     return cv2.Canny(img, 30, 70)
 
-processingFunc("DogEmotion", "ced_filter", filterFunc)
+# 원본 사진을 그냥 output폴더로 옮겨주는 함수
+
+
+def pass_origin(img):
+    return img
+
+
+processingFunc("images", "original", pass_origin)

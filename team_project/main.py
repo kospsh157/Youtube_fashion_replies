@@ -1,11 +1,11 @@
+import datetime as dt
+import time
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import shutil
 import numpy as np
-
-
 
 
 base_dir = 'output_folder'
@@ -58,8 +58,6 @@ img_width, img_height = 200, 200
 batch_size = 32
 
 
-
-
 # 이미지 데이터 전처리
 
 train_datagen = ImageDataGenerator(rescale=1. / 255)
@@ -80,16 +78,8 @@ validation_generator = test_datagen.flow_from_directory(
     class_mode='categorical')
 
 
-
-
-
-
-import time
-import datetime as dt
-
 # 모델 구축
 model = Sequential()
-
 
 
 # 첫 번째 Convolutional 레이어
@@ -113,7 +103,6 @@ model.compile(loss='categorical_crossentropy',
               metrics=['accuracy'])
 
 
-
 # 모델 학습
 epochs = 15
 time2 = time.time()
@@ -124,7 +113,6 @@ model.fit(
 time1 = time.time()
 
 print(f'Learning time: {time1 - time2}')
-
 
 
 time2 = time.time()

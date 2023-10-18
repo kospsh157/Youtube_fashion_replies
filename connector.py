@@ -2,9 +2,9 @@ import psycopg2
 
 # 데이터베이스 설정
 DATABASE = {
-    'dbname': 'your_dbname',
-    'user': 'your_user',
-    'password': 'your_password',
+    'dbname': 'test_1',
+    'user': 'psh0826',
+    'password': '15243',
     'host': 'localhost',  # or your host
     'port': '5432'       # or your port
 }
@@ -27,13 +27,11 @@ connection.close()
 
 
 '''
-    비디오_id,
-    제목,
-    채널명,
-    채널_아이디,
-    댓글,
-    시청수,
-    좋아요,
-    싫어요
-
+    title 
+    published_at 
+    views = item['statistics'].get('viewCount', 0)
+    likes = item['statistics'].get('likeCount', 0)
+    dislikes = item['statistics'].get('dislikeCount', 0)
+    comments = item['statistics'].get('commentCount', 0)
+    replys = item['replys']
 '''

@@ -77,8 +77,8 @@ CHANNEL_IDS = [
 ]
 
 
-SEARCH_KEYWORD = '가을'
-MAX_RESULTS = 50  # 한 번의 요청으로 가져올 수 있는 최대 결과 수
+SEARCH_KEYWORD = '패션'
+MAX_RESULTS = 50  # 한 번의 요청으로 가져올 수 있는 최대 결과 수가 50개임
 
 
 # API URL
@@ -90,13 +90,11 @@ VIDEOS_ENDPOINT = 'https://www.googleapis.com/youtube/v3/videos'
 
 
 total_request_cnt = 0
-
 start_date = "2023-09-01T00:00:00Z"
-end_date = "2023-09-30T23:59:59Z"
+end_date = "2023-09-15T23:59:59Z"
 start_date_obj = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
 all_video_data = []
 
-# video_id가 업데이트가 안되고 있음.
 
 for channel_id in CHANNEL_IDS:
     print('channel_id:', channel_id)
@@ -149,9 +147,11 @@ for channel_id in CHANNEL_IDS:
         # Get the next page token
         next_page_token = search_data.get('nextPageToken')
 
+        # 여기서 위에 next_page_token 값이 없다면, 일주일치는 다 받은 상태이고 다음주로 넘어간다.
         if not next_page_token:
-            print('@@@@@@@@@@@@일주일치가 끝났으니 다음 일주일으로 넘어가자@@@@@@@@@@@@@@@.')
             start_date_obj = next_date_obj
+
+            # 정해진 시간이 넘으면 종료한다.
             end_date_obj = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%SZ")
             if start_date_obj >= end_date_obj:
                 break
@@ -160,12 +160,6 @@ for channel_id in CHANNEL_IDS:
 # publishedAt 문자열을 datetime 객체로 변환하는 함수
 def convert_to_datetime(published_str):
     return datetime.strptime(published_str, '%Y-%m-%dT%H:%M:%SZ')
-
-
-# 확인
-# print('아래 데이터 내용 있는지 확인')
-# print(all_video_data)
-# print(len(all_video_data))
 
 
 # publishedAt 기준으로 오름차순 정렬
