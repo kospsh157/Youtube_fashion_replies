@@ -2,6 +2,7 @@ import requests
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from getReply import getReply
+from DB_injector import insert_video_data
 '''
 구글api는 한번 쿼리를 날리면 500개의 검색결과를 찾는다. 이 수는 500개로 정해져있다. 
 날짜 파라미터를 사용해서 여러번 호출하면 데이터를 모을 수 있다. 
@@ -33,47 +34,47 @@ CHANNEL_IDS = [
     "UCepVy23t8l-CEaASZzfo9Jg",
     "UCJdZej-O_M69bB4M6aiiLcw",
     "UCsxzAjngTaa3bzhF5VgMybQ",
-    "UCfeNRv3gLc0nnlzDQCs-qvw",
-    "UCbjUWryxheN2M1wwYMnXkXQ",
-    "UC9vu2JsuE7g-1r9HkYkOopw",
-    "UClcbTwyRmlOINYXTcNfhdEA",
-    "UCsx0mj4acFcXoH75kOl-WEA",
-    "UCc0byt-rLHB2i15jw-QjXWg",
-    "UCs0dIu9USYQnSyPcekI8Y6A",
-    "UCkCGSs3q66MSkVyOOqKCK1g",
-    "UCbOwqHbQf0uspeRe7lY8e6Q",
-    "UCzYB6YA5f-Tc7GQcIese7pg",
-    "UC8a6z7i9qypp9PqJ_0HhBrw",
-    "UCXXlcPH1stsP3VwYG90s4wg",
-    "UCV-U1crQo6iW7F-7xsuUnFg",
-    "UCw-kXdzxMdMdLNI0ZlFFbmA",
-    "UCSrRZH9QT6li5PIAv0r_6QA",
-    "UCXe53j9Mq0rAWmbIzOMF9fw",
-    "UCr6kh7Iujsdqdqo_rp_sKrA",
-    "UC9gW47NqzI1x7e8qsflvUUw",
-    "UC79CxOQz8FQB4w5iHWEjJtQ",
-    "UCmncNwwVVXvTH4oYIxODxMQ",
-    "UCcRTcy_GuofiJLPLMlVcGxw",
-    "UCKWv0ScT6PpZcpg7ivUVWLA",
-    "UC6VzIz8tJLnetS79VbsHPGg",
-    "UCAAvO0ehWox1bbym3rXKBZw",
-    "UCkPp7PMd1sOcsJCq8_3-1fw",
-    "UCnQRkIhRmXrxGrK4-8n-lVw",
-    "UCygs-_iDpCJOnhuCZibK7JQ",
-    "UCarjMZCmwGZWZwshJXDnA5w",
-    "UC2NFRq9s2neD_Ml0tPhNC2Q",
-    "UCWWsxlEwvznz4Fwq4O5UVMg",
-    "UC0z8bddfRBRBmEC-AjI6UXw",
-    "UCKakHCcjubWyoM3P85iazoA",
-    "UCT8l_qvhkgTBu8-7wz1hZ0Q",
-    "UCVIZWeFmvOhCjJy4tZqertw",
-    "UClN5EsofXLP_SJae9WuzD0A",
-    "UCO78BQwAIG-pEfhgJEt-VRQ",
-    "UCsYWsulNo5XcYkj4e0Nc6CQ",
-    "UCG5bAssl2H0wjLG4BEv5ScQ",
-    "UCEO1HvzguBU7Foh_GvgzePw",
-    "UC8_wgZy23gjTNVQeyfwl92g",
-    "UCXVfodmlGhUpLREncSjuYAw"
+    # "UCfeNRv3gLc0nnlzDQCs-qvw",
+    # "UCbjUWryxheN2M1wwYMnXkXQ",
+    # "UC9vu2JsuE7g-1r9HkYkOopw",
+    # "UClcbTwyRmlOINYXTcNfhdEA",
+    # "UCsx0mj4acFcXoH75kOl-WEA",
+    # "UCc0byt-rLHB2i15jw-QjXWg",
+    # "UCs0dIu9USYQnSyPcekI8Y6A",
+    # "UCkCGSs3q66MSkVyOOqKCK1g",
+    # "UCbOwqHbQf0uspeRe7lY8e6Q",
+    # "UCzYB6YA5f-Tc7GQcIese7pg",
+    # "UC8a6z7i9qypp9PqJ_0HhBrw",
+    # "UCXXlcPH1stsP3VwYG90s4wg",
+    # "UCV-U1crQo6iW7F-7xsuUnFg",
+    # "UCw-kXdzxMdMdLNI0ZlFFbmA",
+    # "UCSrRZH9QT6li5PIAv0r_6QA",
+    # "UCXe53j9Mq0rAWmbIzOMF9fw",
+    # "UCr6kh7Iujsdqdqo_rp_sKrA",
+    # "UC9gW47NqzI1x7e8qsflvUUw",
+    # "UC79CxOQz8FQB4w5iHWEjJtQ",
+    # "UCmncNwwVVXvTH4oYIxODxMQ",
+    # "UCcRTcy_GuofiJLPLMlVcGxw",
+    # "UCKWv0ScT6PpZcpg7ivUVWLA",
+    # "UC6VzIz8tJLnetS79VbsHPGg",
+    # "UCAAvO0ehWox1bbym3rXKBZw",
+    # "UCkPp7PMd1sOcsJCq8_3-1fw",
+    # "UCnQRkIhRmXrxGrK4-8n-lVw",
+    # "UCygs-_iDpCJOnhuCZibK7JQ",
+    # "UCarjMZCmwGZWZwshJXDnA5w",
+    # "UC2NFRq9s2neD_Ml0tPhNC2Q",
+    # "UCWWsxlEwvznz4Fwq4O5UVMg",
+    # "UC0z8bddfRBRBmEC-AjI6UXw",
+    # "UCKakHCcjubWyoM3P85iazoA",
+    # "UCT8l_qvhkgTBu8-7wz1hZ0Q",
+    # "UCVIZWeFmvOhCjJy4tZqertw",
+    # "UClN5EsofXLP_SJae9WuzD0A",
+    # "UCO78BQwAIG-pEfhgJEt-VRQ",
+    # "UCsYWsulNo5XcYkj4e0Nc6CQ",
+    # "UCG5bAssl2H0wjLG4BEv5ScQ",
+    # "UCEO1HvzguBU7Foh_GvgzePw",
+    # "UC8_wgZy23gjTNVQeyfwl92g",
+    # "UCXVfodmlGhUpLREncSjuYAw"
 ]
 
 
@@ -168,6 +169,8 @@ sorted_video_data = sorted(
 
 
 for item in sorted_video_data:
+
+    video_id = item['id']
     title = item['snippet']['title']
     published_at = item['snippet']['publishedAt']
     views = item['statistics'].get('viewCount', 0)
@@ -176,6 +179,7 @@ for item in sorted_video_data:
     comments = item['statistics'].get('commentCount', 0)
     replys = item['replys']
 
+    print(f"Video_id: {video_id}")
     print(f"Title: {title}")
     print(f"Published At: {published_at}")
     print(f"Views: {views}")
@@ -187,3 +191,29 @@ for item in sorted_video_data:
 
 
 print('총 비디오 데이터 개수: ', len(sorted_video_data))
+
+
+# 비디오 삽입
+insert_video_data(sorted_video_data)
+
+
+'''
+CREATE TABLE video_datas (
+    video_id varchar(255) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    time timestamp NOT NULL,
+    views BIGINT DEFAULT 0,
+    likes BIGINT DEFAULT 0,
+    dislikes BIGINT DEFAULT 0,
+    comments_cnt BIGINT DEFAULT 0,
+    comments TEXT DEFAULT ''
+);
+
+CREATE TABLE channels (
+    name varchar(255) NOT NULL,
+    id VARCHAR(255) PRIMARY KEY,
+    subscribers int NOT NULL,
+    topic varchar(255) NOT NULL
+);
+
+'''
