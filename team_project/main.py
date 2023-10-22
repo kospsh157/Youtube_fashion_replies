@@ -6,9 +6,10 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import shutil
 import numpy as np
+import time
+import datetime as dt
 
-
-base_dir = 'DogEmotion'
+base_dir = 'output_folder'
 emotions = ['angry', 'happy', 'relaxed', 'sad']
 
 train_dir = os.path.join(base_dir, 'train')
@@ -38,7 +39,7 @@ for emotion in emotions:
     for fname in train_files:
         src = os.path.join(emotion_dir, fname)
         dst = os.path.join(train_emotion_dir, fname)
-        shutil.move(src, dst)
+        shutil.copy(src, dst)
 
     # 검증 데이터 폴더 생성 및 파일 이동
     val_emotion_dir = os.path.join(val_dir, emotion)
@@ -47,16 +48,15 @@ for emotion in emotions:
     for fname in val_files:
         src = os.path.join(emotion_dir, fname)
         dst = os.path.join(val_emotion_dir, fname)
-        shutil.move(src, dst)
+        shutil.copy(src, dst)
 
 
 # 데이터 경로 설정
-base_dir = 'DogEmotion'
+base_dir = 'output_folder'
 train_data_dir = os.path.join(base_dir, 'train')
 validation_data_dir = os.path.join(base_dir, 'validation')
-img_width, img_height = 150, 150
+img_width, img_height = 224, 224
 batch_size = 32
-
 
 
 
@@ -66,12 +66,14 @@ test_datagen = ImageDataGenerator(rescale=1. / 255)
 
 train_generator = train_datagen.flow_from_directory(
     train_data_dir,
+    # color_mode='rgb',
     target_size=(img_width, img_height),
     batch_size=batch_size,
     class_mode='categorical')
 
 validation_generator = test_datagen.flow_from_directory(
     validation_data_dir,
+    # color_mode='grayscale',
     target_size=(img_width, img_height),
     batch_size=batch_size,
     class_mode='categorical')
@@ -80,43 +82,49 @@ validation_generator = test_datagen.flow_from_directory(
 
 
 
-import time
-import datetime as dt
 
-# 모델 구축
-model = Sequential()
-# 첫 번째 Convolutional 레이어
-model.add(Conv2D(16, (3, 3), activation='relu',
-          input_shape=(img_width, img_height, 3)))
-model.add(MaxPooling2D(pool_size=(2, 2)))
 
-# 두 번째 Convolutional 레이어
-model.add(Conv2D(32, (3, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
 
-# Fully Connected 레이어
-model.add(Flatten())
-model.add(Dense(32, activation='relu'))
 
-# Output 레이어
-model.add(Dense(4, activation='softmax'))
 
-model.compile(loss='categorical_crossentropy',
-              optimizer='adam',
-              metrics=['accuracy'])
+from tensorflow.keras.applications.resnet50 import ResNet50
+from tensorflow.keras.models import Model
+from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
+
+# 사전 학습된 ResNet50 모델 로드
+# "This model requires images with 3 channels set."
+base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+
+
+# 사용자 정의 출력층 추가
+x = base_model.output
+x = GlobalAveragePooling2D()(x)
+x = Dense(1024, activation='relu')(x)
+predictions = Dense(4, activation='softmax')(x)
+
+model = Model(inputs=base_model.input, outputs=predictions)
+
+# # 첫 번째 부분의 모델을 고정 (사전 학습된 가중치 변경 안 함)
+# for layer in base_model.layers:
+#     layer.trainable = False
+
+
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+
 
 # 모델 학습
-epochs = 20
-
-
-time2 = time.time()
-model.fit(
-    train_generator,
-    epochs=epochs,
-    validation_data=validation_generator)
-
 time1 = time.time()
+model.fit(train_generator, epochs=40, validation_data=validation_generator)
+time2 = time.time()
+print('Learning Time: ', time2 - time1)
 
-print(time1 - time2)
-dt_object = dt.datetime.fromtimestamp(time1 - time2)
-print("Readable Time:", dt_object)
+
+# 모델 평가
+loss, accuracy = model.evaluate(validation_generator)
+print(f'Validation Loss: {loss:.4f}')
+print(f'Validation Accuracy: {accuracy:.4f}')
+
+
+
+# If you run this code more than once, make sure to comment out the section that splits the training and test data before executing.

@@ -114,38 +114,21 @@ def random_rotateFunc(img):
 
 # 흑백으로 바꾸기
 def to_grayscale(img):
-    gray_img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-    # 흑백으로 바꿔도 채널은 계속 3채널로 유지되는 경우가 있다.
-    # 다음 코드로 채널을 1채널로 바꾼다.
-    if len(gray_img.shape) == 3:
-        gray_img = gray_img[:, :, 0]
-    
-    return gray_img
+    return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
+
 # 흑백 이미지 평탄화 시키기
 def to_flat(img):
-    # 이미지가 그레이스케일이 아닌 경우 그레이스케일로 변환
-    if len(img.shape) == 3:
-        gray_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    else:
-        gray_img = img
-
-    # 히스토그램 평활화 수행
-    return cv2.equalizeHist(gray_img)
+    grayscale_img = to_grayscale(img)
+    return cv2.equalizeHist(grayscale_img)
 
 
 
 
-processingFunc("output_folder", "to_flat", to_flat)
+processingFunc("DogEmotion", "original", pass_origin)
 
 
 
 
-# img ='./tDKYiQEAoyo9bKAeZtij2dnxR8A564497_to_gray.jpg'
-
-# import cv2
-# image = cv2.imread(img)
-
-# print(image.shape)
-# print(image.dtype)
-
+# delete to_gray images but not to_flat images in this folder
+# find "$directory_path" -type f -name "*to_gray*" ! -name "*to_flat*" -exec rm {} \;
 
