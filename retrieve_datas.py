@@ -3,6 +3,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from getReply import getReply
 from DB_injector import insert_video_data
+from DB_retriever import get_channel_ids
 '''
 구글api는 한번 쿼리를 날리면 500개의 검색결과를 찾는다. 이 수는 500개로 정해져있다. 
 날짜 파라미터를 사용해서 여러번 호출하면 데이터를 모을 수 있다. 
@@ -23,59 +24,26 @@ channel_ids = ["UCkinYTS9IHqOEwR1Sze2JTw", "UCF8AeLlUbEpKju6v1H6p8Eg", "UCcQTRi6
 # 만약 nextPageToken이게 없다면 해당 응답이 마지막 페이지라는 것이다. 따라서 이걸 이용해서 계속해서 모든 데이터를
 # 받을 때 까지 호출 할수 있다.
 
-API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
+# 메인계정
+# API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
+
+# 비빅바
+# API_KEY = 'AIzaSyA4ltLYUhWYUEa3rbevQNCAELquiG-fWPg'
+
+# 하마
+# API_KEY = 'AIzaSyA-SXNjsNcNijuLnete6DQLk4X_F7URIis'
+
+# 바밤바
+API_KEY = 'AIzaSyBQU5HopruqfPu9kqc1XOtEs69O4IEfW7k'
 # CHANNEL_ID = 'UCF8AeLlUbEpKju6v1H6p8Eg'  # 원하는 채널의 ID
 # CHANNEL_IDS = ["UCkinYTS9IHqOEwR1Sze2JTw",
 #                "UCF8AeLlUbEpKju6v1H6p8Eg"]  # 여러 채널 ID를 리스트로 추가
 
-# 46개의 패션 관련 채널 구독자 10만 이상인 것들.
-CHANNEL_IDS = [
-    "UCexnMWt_GyyAIkLCn7x36nw",
-    "UCepVy23t8l-CEaASZzfo9Jg",
-    "UCJdZej-O_M69bB4M6aiiLcw",
-    "UCsxzAjngTaa3bzhF5VgMybQ",
-    # "UCfeNRv3gLc0nnlzDQCs-qvw",
-    # "UCbjUWryxheN2M1wwYMnXkXQ",
-    # "UC9vu2JsuE7g-1r9HkYkOopw",
-    # "UClcbTwyRmlOINYXTcNfhdEA",
-    # "UCsx0mj4acFcXoH75kOl-WEA",
-    # "UCc0byt-rLHB2i15jw-QjXWg",
-    # "UCs0dIu9USYQnSyPcekI8Y6A",
-    # "UCkCGSs3q66MSkVyOOqKCK1g",
-    # "UCbOwqHbQf0uspeRe7lY8e6Q",
-    # "UCzYB6YA5f-Tc7GQcIese7pg",
-    # "UC8a6z7i9qypp9PqJ_0HhBrw",
-    # "UCXXlcPH1stsP3VwYG90s4wg",
-    # "UCV-U1crQo6iW7F-7xsuUnFg",
-    # "UCw-kXdzxMdMdLNI0ZlFFbmA",
-    # "UCSrRZH9QT6li5PIAv0r_6QA",
-    # "UCXe53j9Mq0rAWmbIzOMF9fw",
-    # "UCr6kh7Iujsdqdqo_rp_sKrA",
-    # "UC9gW47NqzI1x7e8qsflvUUw",
-    # "UC79CxOQz8FQB4w5iHWEjJtQ",
-    # "UCmncNwwVVXvTH4oYIxODxMQ",
-    # "UCcRTcy_GuofiJLPLMlVcGxw",
-    # "UCKWv0ScT6PpZcpg7ivUVWLA",
-    # "UC6VzIz8tJLnetS79VbsHPGg",
-    # "UCAAvO0ehWox1bbym3rXKBZw",
-    # "UCkPp7PMd1sOcsJCq8_3-1fw",
-    # "UCnQRkIhRmXrxGrK4-8n-lVw",
-    # "UCygs-_iDpCJOnhuCZibK7JQ",
-    # "UCarjMZCmwGZWZwshJXDnA5w",
-    # "UC2NFRq9s2neD_Ml0tPhNC2Q",
-    # "UCWWsxlEwvznz4Fwq4O5UVMg",
-    # "UC0z8bddfRBRBmEC-AjI6UXw",
-    # "UCKakHCcjubWyoM3P85iazoA",
-    # "UCT8l_qvhkgTBu8-7wz1hZ0Q",
-    # "UCVIZWeFmvOhCjJy4tZqertw",
-    # "UClN5EsofXLP_SJae9WuzD0A",
-    # "UCO78BQwAIG-pEfhgJEt-VRQ",
-    # "UCsYWsulNo5XcYkj4e0Nc6CQ",
-    # "UCG5bAssl2H0wjLG4BEv5ScQ",
-    # "UCEO1HvzguBU7Foh_GvgzePw",
-    # "UC8_wgZy23gjTNVQeyfwl92g",
-    # "UCXVfodmlGhUpLREncSjuYAw"
-]
+
+# postgresql 접속해서 id 받아와야함
+channel_ids = get_channel_ids()
+# 각 항목이 튜플로 감싸져있어서 풀고 깨끗하게 채널만 담김 리스트형태로 만들어야함.
+CHANNELS = [channel[0] for channel in channel_ids]
 
 
 SEARCH_KEYWORD = '패션'
@@ -91,20 +59,23 @@ VIDEOS_ENDPOINT = 'https://www.googleapis.com/youtube/v3/videos'
 
 
 total_request_cnt = 0
-start_date = "2023-09-01T00:00:00Z"
-end_date = "2023-09-15T23:59:59Z"
-start_date_obj = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
+
 all_video_data = []
 
 
-for channel_id in CHANNEL_IDS:
+for channel_id in CHANNELS:
     print('channel_id:', channel_id)
+
     next_page_token = None
+    start_date = "2023-09-01T00:00:00Z"
+    end_date = "2023-09-30T23:59:59Z"
+    start_date_obj = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
     while True:
         print(f'총 요청 횟수: {total_request_cnt}')
         total_request_cnt += 1
+        next_date_obj = start_date_obj + relativedelta(weeks=2)
 
-        next_date_obj = start_date_obj + relativedelta(weeks=1)
+        print(f'현재 자료 수집중인 기간: {start_date_obj} 부터 {next_date_obj} 여기까지')
 
         search_params = {
             'key': API_KEY,
@@ -129,6 +100,8 @@ for channel_id in CHANNEL_IDS:
 
         if len(search_data['items']) == 0:
             print('지금 검색으로는 영상이 없음')
+        else:
+            print('@@@@@현재 채널의 동영상 개수@@@@@@: ', len(search_data['items']))
 
         # Fetch video details using video IDs
         videos_params = {
@@ -140,10 +113,12 @@ for channel_id in CHANNEL_IDS:
         all_video_data.extend(videos_response.json()['items'])
 
         # 해당 비디오에 대한 댓글들도 가져오기
-        for idx, video_item in enumerate(all_video_data):
-            video_id = video_item['id']  # 또는 올바른 키 경로를 사용하여 video ID를 가져옵니다.
-            reply = getReply(video_id, API_KEY)
-            all_video_data[idx]['replys'] = reply
+        # 동시에 all_video_data에서 해당 아이디 찾아서 리플 추가하기
+        for id in video_ids:
+            replies = getReply(id, API_KEY)
+            for item in all_video_data:
+                if item['id'] == id:
+                    item['replies'] = replies
 
         # Get the next page token
         next_page_token = search_data.get('nextPageToken')
@@ -156,9 +131,11 @@ for channel_id in CHANNEL_IDS:
             end_date_obj = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%SZ")
             if start_date_obj >= end_date_obj:
                 break
-
+    print('현재까지 모은 @@총 동영상@@ 개수: ', len(all_video_data))
 
 # publishedAt 문자열을 datetime 객체로 변환하는 함수
+
+
 def convert_to_datetime(published_str):
     return datetime.strptime(published_str, '%Y-%m-%dT%H:%M:%SZ')
 
@@ -177,7 +154,7 @@ for item in sorted_video_data:
     likes = item['statistics'].get('likeCount', 0)
     dislikes = item['statistics'].get('dislikeCount', 0)
     comments = item['statistics'].get('commentCount', 0)
-    replys = item['replys']
+    replies = item['replies']
 
     print(f"Video_id: {video_id}")
     print(f"Title: {title}")
@@ -186,34 +163,12 @@ for item in sorted_video_data:
     print(f"Likes: {likes}")
     print(f"Dislikes: {dislikes}")
     print(f"Comments: {comments}")
-    print(f"Replys: {replys}")
+    print(f"Replies: {replies}")
     print("="*50)
 
 
 print('총 비디오 데이터 개수: ', len(sorted_video_data))
 
 
-# 비디오 삽입
-insert_video_data(sorted_video_data)
-
-
-'''
-CREATE TABLE video_datas (
-    video_id varchar(255) PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    time timestamp NOT NULL,
-    views BIGINT DEFAULT 0,
-    likes BIGINT DEFAULT 0,
-    dislikes BIGINT DEFAULT 0,
-    comments_cnt BIGINT DEFAULT 0,
-    comments TEXT DEFAULT ''
-);
-
-CREATE TABLE channels (
-    name varchar(255) NOT NULL,
-    id VARCHAR(255) PRIMARY KEY,
-    subscribers int NOT NULL,
-    topic varchar(255) NOT NULL
-);
-
-'''
+# 비디오 데이타 삽입
+insert_video_data(sorted_video_data, SEARCH_KEYWORD)

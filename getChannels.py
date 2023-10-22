@@ -57,7 +57,7 @@ def main(api_key, query):
             break
 
         # results가 10000개가 넘으면 반복문 탈출
-        if len(results) > 10000:
+        if len(results) > 1000:
             print(f'한도를 넘었습니다. 종료합니다. 현재 총 {len(results)}채널 입니다.')
             break
 
@@ -105,4 +105,5 @@ def main(api_key, query):
 
 if __name__ == "__main__":
     API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
+    API_KEY2 = 'AIzaSyA4ltLYUhWYUEa3rbevQNCAELquiG-fWPg'
     main(API_KEY, '패션')

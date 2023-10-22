@@ -1,7 +1,30 @@
-from get_db_connection import get_db_connection
+from DB_connector import get_db_connection
 
 
-def insert_video_data(video_data_list):
+'''
+CREATE TABLE video_datas (
+    video_id varchar(255) PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    time timestamp NOT NULL,
+    views BIGINT DEFAULT 0,
+    likes BIGINT DEFAULT 0,
+    dislikes BIGINT DEFAULT 0,
+    comments_cnt BIGINT DEFAULT 0,
+    comments TEXT DEFAULT '',
+    query VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE channels (
+    name varchar(255) NOT NULL,
+    id VARCHAR(255) PRIMARY KEY,
+    subscribers int NOT NULL,
+    topic varchar(255) NOT NULL
+);
+
+'''
+
+
+def insert_video_data(video_data_list, query):
     connection = get_db_connection()
     cursor = connection.cursor()
 
@@ -14,8 +37,8 @@ def insert_video_data(video_data_list):
         likes = item['statistics'].get('likeCount', 0)
         dislikes = item['statistics'].get('dislikeCount', 0)
         comments_cnt = item['statistics'].get('commentCount', 0)
-        comments = item['replys']
-
+        comments = item['replies']
+        query = query.strip()
         # commnets는 댓글 여러개가 담긴 리스트형태이다.
         # 따라서 반복문을 통해서 strip()을 날려야한다.
         comments = [one_reply.strip() for one_reply in comments]
@@ -28,12 +51,13 @@ def insert_video_data(video_data_list):
             'likes': likes,
             'dislikes': dislikes,
             'comments_cnt': comments_cnt,
-            'comments': comments
+            'comments': comments,
+            'query': query
         }
 
         insert_query = """
-        INSERT INTO video_datas (video_id, title, time, views, likes, dislikes, comments_cnt, comments)
-        VALUES (%(video_id)s, %(title)s, %(time)s, %(views)s, %(likes)s, %(dislikes)s, %(comments_cnt)s, %(comments)s);
+        INSERT INTO video_datas (video_id, title, time, views, likes, dislikes, comments_cnt, comments, query)
+        VALUES (%(video_id)s, %(title)s, %(time)s, %(views)s, %(likes)s, %(dislikes)s, %(comments_cnt)s, %(comments)s, %(query)s);
         """
 
         cursor.execute(insert_query, video_data)
