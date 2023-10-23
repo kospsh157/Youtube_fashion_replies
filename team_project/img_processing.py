@@ -71,19 +71,14 @@ def processingFunc(base_dir_path, effect_name, effectFunc):
                 print("Failed to save image!")
 
 
-
-
-
-
-
-
 def filterFunc(img):
     return cv2.Canny(img, 30, 70)
 
 # 원본 사진을 그냥 output폴더로 옮겨주는 함수
+
+
 def pass_origin(img):
     return img
-
 
 
 # 기본 이미지 전처리들
@@ -96,6 +91,8 @@ def pass_origin(img):
 
 # 크기 조절
 # resize img
+
+
 def resize_func(img):
     # type what to do to original images here
     return cv2.resize(img, (384, 384))
@@ -106,8 +103,8 @@ def resize_func(img):
 def random_rotateFunc(img):
     rows, cols = img.shape[:2]
     random_angle = np.random.randint(1, 36) * 10
-    # 첫번째: 회전 중심점, 두번째: 회전 각도, 
-    # 세번째: 화면 확대/축소 비율(1은 원본, 2는 2배 0.5는 절반크기)    
+    # 첫번째: 회전 중심점, 두번째: 회전 각도,
+    # 세번째: 화면 확대/축소 비율(1은 원본, 2는 2배 0.5는 절반크기)
     M = cv2.getRotationMatrix2D((cols/2, rows/2), random_angle, 1)
     return cv2.warpAffine(img, M, (cols, rows))
 
@@ -116,19 +113,28 @@ def random_rotateFunc(img):
 def to_grayscale(img):
     return cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
 
+
 # 흑백 이미지 평탄화 시키기
 def to_flat(img):
     grayscale_img = to_grayscale(img)
     return cv2.equalizeHist(grayscale_img)
 
 
+# 모폴로지 연산
+# 열기
+def opening(img):
+    kernel = np.ones((5, 5), np.uint8)
+    return cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
 
-processingFunc("DogEmotion", "original", pass_origin)
+# 닫기
+def closing(img):
+    kernel = np.ones((5, 5), np.uint8)
+    return cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
 
 
+processingFunc("DogEmotion", "opening", opening)
 
 
 # delete to_gray images but not to_flat images in this folder
 # find "$directory_path" -type f -name "*to_gray*" ! -name "*to_flat*" -exec rm {} \;
-

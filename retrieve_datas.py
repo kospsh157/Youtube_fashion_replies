@@ -25,7 +25,7 @@ channel_ids = ["UCkinYTS9IHqOEwR1Sze2JTw", "UCF8AeLlUbEpKju6v1H6p8Eg", "UCcQTRi6
 # 받을 때 까지 호출 할수 있다.
 
 # 메인계정
-# API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
+API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
 
 # 비빅바
 # API_KEY = 'AIzaSyA4ltLYUhWYUEa3rbevQNCAELquiG-fWPg'
@@ -34,7 +34,7 @@ channel_ids = ["UCkinYTS9IHqOEwR1Sze2JTw", "UCF8AeLlUbEpKju6v1H6p8Eg", "UCcQTRi6
 # API_KEY = 'AIzaSyA-SXNjsNcNijuLnete6DQLk4X_F7URIis'
 
 # 바밤바
-API_KEY = 'AIzaSyBQU5HopruqfPu9kqc1XOtEs69O4IEfW7k'
+# API_KEY = 'AIzaSyBQU5HopruqfPu9kqc1XOtEs69O4IEfW7k'
 # CHANNEL_ID = 'UCF8AeLlUbEpKju6v1H6p8Eg'  # 원하는 채널의 ID
 # CHANNEL_IDS = ["UCkinYTS9IHqOEwR1Sze2JTw",
 #                "UCF8AeLlUbEpKju6v1H6p8Eg"]  # 여러 채널 ID를 리스트로 추가

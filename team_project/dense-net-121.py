@@ -1,8 +1,8 @@
-
-
-from tensorflow.keras.layers import Dense, GlobalAveragePooling2D
+from tensorflow.keras.applications import DenseNet121
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Input
 from tensorflow.keras.models import Model
-from tensorflow.keras.applications.resnet50 import ResNet50
+import time
+
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, Flatten, Dense
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
@@ -70,25 +70,21 @@ test_datagen = ImageDataGenerator(rescale=1. / 255)
 
 train_generator = train_datagen.flow_from_directory(
     train_data_dir,
-    # color_mode='grayscale',
+    color_mode='grayscale',
     target_size=(img_width, img_height),
     batch_size=batch_size,
     class_mode='categorical')
 
 validation_generator = test_datagen.flow_from_directory(
     validation_data_dir,
-    # color_mode='grayscale',
+    color_mode='grayscale',
     target_size=(img_width, img_height),
     batch_size=batch_size,
     class_mode='categorical')
 
 
-# 사전 학습된 ResNet50 모델 로드
-# "This model requires images with 3 channels set."
-# base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
-# ResNet50 모델을 사전 학습된 가중치 없이 로드
-base_model = ResNet50(weights=None, include_top=False,
-                      input_tensor=Input(shape=(224, 224, 3)))
+base_model = DenseNet121(weights=None, include_top=False,
+                         input_tensor=Input(shape=(224, 224, 1)))
 
 # 사용자 정의 출력층 추가
 x = base_model.output
@@ -97,13 +93,13 @@ x = Dense(1024, activation='relu')(x)
 predictions = Dense(4, activation='softmax')(x)
 model = Model(inputs=base_model.input, outputs=predictions)
 
-# # 첫 번째 부분의 모델을 고정 (사전 학습된 가중치 변경 안 함)
+# 첫 번째 부분의 모델을 고정 (사전 학습된 가중치 변경 안 함)
+# (위에서 주석처리 되어 있어서 필요시 주석 해제 후 사용하시면 됩니다.)
 # for layer in base_model.layers:
 #     layer.trainable = False
 
 model.compile(optimizer='adam', loss='categorical_crossentropy',
               metrics=['accuracy'])
-
 
 # 모델 학습
 time1 = time.time()
@@ -111,11 +107,7 @@ model.fit(train_generator, epochs=40, validation_data=validation_generator)
 time2 = time.time()
 print('Learning Time: ', time2 - time1)
 
-
 # 모델 평가
 loss, accuracy = model.evaluate(validation_generator)
 print(f'Validation Loss: {loss:.4f}')
 print(f'Validation Accuracy: {accuracy:.4f}')
-
-
-# If you run this code more than once, make sure to comment out the section that splits the training and test data before executing.
