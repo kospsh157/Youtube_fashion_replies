@@ -25,13 +25,13 @@ channel_ids = ["UCkinYTS9IHqOEwR1Sze2JTw", "UCF8AeLlUbEpKju6v1H6p8Eg", "UCcQTRi6
 # 받을 때 까지 호출 할수 있다.
 
 # 메인계정
-API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
+# API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
 
 # 비빅바
 # API_KEY = 'AIzaSyA4ltLYUhWYUEa3rbevQNCAELquiG-fWPg'
 
 # 하마
-# API_KEY = 'AIzaSyA-SXNjsNcNijuLnete6DQLk4X_F7URIis'
+API_KEY = 'AIzaSyA-SXNjsNcNijuLnete6DQLk4X_F7URIis'
 
 # 바밤바
 # API_KEY = 'AIzaSyBQU5HopruqfPu9kqc1XOtEs69O4IEfW7k'
@@ -67,13 +67,13 @@ for channel_id in CHANNELS:
     print('channel_id:', channel_id)
 
     next_page_token = None
-    start_date = "2023-09-01T00:00:00Z"
-    end_date = "2023-09-30T23:59:59Z"
+    start_date = "2023-10-01T00:00:00Z"
+    end_date = "2023-10-22T23:59:59Z"
     start_date_obj = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
     while True:
         print(f'총 요청 횟수: {total_request_cnt}')
         total_request_cnt += 1
-        next_date_obj = start_date_obj + relativedelta(weeks=2)
+        next_date_obj = start_date_obj + relativedelta(days=22)
 
         print(f'현재 자료 수집중인 기간: {start_date_obj} 부터 {next_date_obj} 여기까지')
 
