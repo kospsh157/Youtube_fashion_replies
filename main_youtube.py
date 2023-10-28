@@ -67,13 +67,13 @@ for channel_id in CHANNELS:
     print('channel_id:', channel_id)
 
     next_page_token = None
-    start_date = "2023-09-01T00:00:00Z"
-    end_date = "2023-09-30T23:59:59Z"
+    start_date = "2022-11-01T00:00:00Z"
+    end_date = "2022-11-30T23:59:59Z"
     start_date_obj = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
     while True:
         print(f'총 요청 횟수: {total_request_cnt}')
         total_request_cnt += 1
-        next_date_obj = start_date_obj + relativedelta(weeks=2)
+        next_date_obj = start_date_obj + relativedelta(days=30)
 
         print(f'현재 자료 수집중인 기간: {start_date_obj} 부터 {next_date_obj} 여기까지')
 
