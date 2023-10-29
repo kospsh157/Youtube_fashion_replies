@@ -40,6 +40,29 @@ def select_query(columns):
 
     return rows
 
+# video_datas_normalized 테이블 데이터 불러오기
+
+
+def select_normalized(columns):
+    if not columns:
+        raise ValueError("No columns provided for selection.")
+
+    if isinstance(columns, (list, tuple)):
+        columns = ", ".join(columns)
+    elif isinstance(columns, str):
+        pass
+    else:
+        raise TypeError(
+            "Columns should be either a string or a list/tuple of strings.")
+
+    conn = get_db_connection()
+    with conn:
+        with conn.cursor() as cursor:
+            cursor.execute(f'SELECT {columns} FROM video_datas_normalized')
+            rows = cursor.fetchall()
+
+    return rows
+
 
 if __name__ == "__main__":
     channel_ids = get_channel_ids()
