@@ -125,7 +125,7 @@ def sharpen_image(image):
 # 두번째 인자: 새롭게 처리되어 나올 이미지의 이름을 입력
 # 예를들어 "closing" 이라고 적으면 처리된 이미지 파일 이름은 "원본파일명_closing.jpg" 이렇게 나옴
 # 세번째 인자: 실질적으로 전처리를 하는 함수
-processingFunc("DogEmotion", "sharpen", sharpen_image)
+processingFunc("DogEmotion", "pass_origin", pass_origin)
 
 
 # delete to_gray images but not to_flat images in this folder
