@@ -10,7 +10,13 @@ REST_API_KEY = 'ada696dfddc16d1227e321d7574f06c1'
 # 이미지 생성하기 요청
 
 
-def t2i(prompt, negative_prompt):
+def t2i(fashion_items, negative_prompt):
+    combined_srt = ", ".join(fashion_items)
+    prompt = '''
+         The handsome male model is wearing, 
+    '''
+    prompt += combined_srt
+
     r = requests.post(
         'https://api.kakaobrain.com/v2/inference/karlo/t2i',
         json={
@@ -28,16 +34,14 @@ def t2i(prompt, negative_prompt):
 
 
 # 프롬프트에 사용할 제시어
-prompt = '''
-This is a man wear style image.
-Shirt, vest, slacks, shoes, scarf, mask, fall coat.
-'''
-negative_prompt = "sleeping cat, dog, ugly face, cropped"
 
-# 이미지 생성하기 REST API 호출
-response = t2i(prompt, negative_prompt)
 
-# 응답의 첫 번째 이미지 생성 결과 출력하기
-result = Image.open(urllib.request.urlopen(
-    response.get("images")[0].get("image")))
-result.show()
+# negative_prompt = "sleeping cat, dog, ugly face, cropped"
+
+# # 이미지 생성하기 REST API 호출
+# response = t2i(prompt, negative_prompt)
+
+# # 응답의 첫 번째 이미지 생성 결과 출력하기
+# result = Image.open(urllib.request.urlopen(
+#     response.get("images")[0].get("image")))
+# result.show()
