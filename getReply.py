@@ -10,7 +10,6 @@ import requests
     처음 요청시 pageToken 사용: 처음에는 pageToken을 지정하지 않고 API 요청을 보냅니다.
     응답에서 nextPageToken 사용: API의 응답에는 nextPageToken이 포함될 수 있습니다. 
     이 토큰은 다음 페이지의 데이터를 요청하기 위한 것입니다.
-
 '''
 
 

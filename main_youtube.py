@@ -18,17 +18,16 @@ channel_ids = ["UCkinYTS9IHqOEwR1Sze2JTw", "UCF8AeLlUbEpKju6v1H6p8Eg", "UCcQTRi6
 
 # .json()는 서버로부터 받은 응답 객체를 파이썬의 오브젝트(리스트나 딕셔너리)로 반환한다.
 
-
 # nextPageToken 속성은 구글 api가 보내는 응답에 있는 속성으로, 이 속성값 안에 있는 데이터로 다시 호출하면 바로
 # 이전 데이터에 이어서 다시 연속적으로 응답을 해준다
 # 만약 nextPageToken이게 없다면 해당 응답이 마지막 페이지라는 것이다. 따라서 이걸 이용해서 계속해서 모든 데이터를
 # 받을 때 까지 호출 할수 있다.
 
 # 메인계정
-API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
+# API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
 
 # 비빅바
-# API_KEY = 'AIzaSyA4ltLYUhWYUEa3rbevQNCAELquiG-fWPg'
+API_KEY = 'AIzaSyA4ltLYUhWYUEa3rbevQNCAELquiG-fWPg'
 
 # 하마
 # API_KEY = 'AIzaSyA-SXNjsNcNijuLnete6DQLk4X_F7URIis'
@@ -44,12 +43,8 @@ API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
 channel_ids = get_channel_ids()
 # 각 항목이 튜플로 감싸져있어서 풀고 깨끗하게 채널만 담김 리스트형태로 만들어야함.
 CHANNELS = [channel[0] for channel in channel_ids]
-
-
 SEARCH_KEYWORD = '패션'
 MAX_RESULTS = 50  # 한 번의 요청으로 가져올 수 있는 최대 결과 수가 50개임
-
-
 # API URL
 SEARCH_ENDPOINT = 'https://www.googleapis.com/youtube/v3/search'
 # 키워드와 원하는 채널명들을 넣어주면 그에 해당하는 비디오들을 찾아서 id들을 반환
@@ -57,26 +52,19 @@ SEARCH_ENDPOINT = 'https://www.googleapis.com/youtube/v3/search'
 VIDEOS_ENDPOINT = 'https://www.googleapis.com/youtube/v3/videos'
 # 위에서 받은 비디오 고유 id들을 이용해서 이걸 가지고 비디오들의 각각의 통계 정보들을 반환.
 
-
 total_request_cnt = 0
-
 all_video_data = []
-
-
 for channel_id in CHANNELS:
     print('channel_id:', channel_id)
-
     next_page_token = None
-    start_date = "2022-11-01T00:00:00Z"
-    end_date = "2022-11-30T23:59:59Z"
+    start_date = "2023-10-01T00:00:00Z"
+    end_date = "2023-10-31T23:59:59Z"
     start_date_obj = datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
     while True:
         print(f'총 요청 횟수: {total_request_cnt}')
         total_request_cnt += 1
-        next_date_obj = start_date_obj + relativedelta(days=30)
-
+        next_date_obj = start_date_obj + relativedelta(days=31)
         print(f'현재 자료 수집중인 기간: {start_date_obj} 부터 {next_date_obj} 여기까지')
-
         search_params = {
             'key': API_KEY,
             'q': SEARCH_KEYWORD,
@@ -92,7 +80,6 @@ for channel_id in CHANNELS:
 
         search_response = requests.get(SEARCH_ENDPOINT, params=search_params)
         search_data = search_response.json()
-
         total_results = search_data["pageInfo"]["totalResults"]
 
         # search_data['items']가 0이면 관련 비디오 영상이 없다는 뜻이다.

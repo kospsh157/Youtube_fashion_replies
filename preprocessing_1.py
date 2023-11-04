@@ -53,7 +53,7 @@ def clean_text(text):
     cleaned_text = re.sub("\s+", " ", cleaned_text)  # 연속된 공백을 하나로 축소
     return cleaned_text
 
-# 위 정규식을 거치고 나면 텅텅 비어 있는 값 '', 혹은 공백만 있는 값들이 있을 수 있음 '     '
+# 위 정규식을 거치고 나면 텅텅 비어 있는 값 '', 혹은 공백만 있는 값들이 있을 수 있음
 # 이 값들도 제거하는 정규식 => '^\s*$'
 
 
