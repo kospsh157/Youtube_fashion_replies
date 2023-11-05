@@ -1,15 +1,16 @@
 # coding: utf-8
 
+import time
+
 import gensim
 from konlpy.tag import Mecab
-
 from gensim import corpora
 from pprint import pprint
 from mecab import MeCab
 from DB_retriever import select_normalized
 import pandas as pd
-import requests
 import json
+import requests
 import urllib
 from PIL import Image
 from karlo import t2i
@@ -18,7 +19,6 @@ from papago import translate_with_papago
 # 띄어쓰기 정형화 된 것들 다시 불러와서 데이타프레임으로 저장
 rows = select_normalized(['title', 'comments'])
 df = pd.DataFrame(rows, columns=['Title', 'Comments'])
-
 # 토큰화
 stopwords = ['츠', '진행', '탑', '즈', '나중', '끈', '즈 ', '짐 ', '이야기 ', '츠 ', '당장 ', '슈', '나중 ', '진행 ', '하트 ', '스타일링 ', '일본 ', '지퍼 ', '슈 ', '에스 ', '카드 ', '세인 ', '끌 ', '이야기 ', '에스 ', '끈 ', '메종 ', '길이 ', '참여', '알파카', '제목', '트렌드', '완성', '사이', '포기', '장바구니', '국내', '노력', '감기',
              '예스', '효과', '세탁', '턱', '열', '얄', '일반', '보통', '연출', '블랭크', '주름', '연출', '노드', '유익', '천', '발매', '스탈', '발매', '신상',
@@ -132,8 +132,11 @@ dictionary = corpora.Dictionary(title_tokened)
 # 문서-단어 매트릭스 생성
 corpus = [dictionary.doc2bow(text) for text in title_tokened]
 
+
+time1 = time.time()
+
 # LDA 모델 학습
-num_topics = 10
+num_topics = 20
 lda_model = gensim.models.LdaModel(
     corpus, num_topics=num_topics, id2word=dictionary, passes=15)
 
@@ -142,10 +145,16 @@ lda_model = gensim.models.LdaModel(
 negative_prompt = "sleeping cat, dog, ugly face, cropped"
 
 # 학습된 토픽들 출력
-topics = lda_model.print_topics(num_words=10)
+topics = lda_model.print_topics(num_words=20)
 for topic in topics:
     print(topic)
-# for idx, topic in topics:
+
+
+time2 = time.time()
+
+print('걸린시간:', time2 - time1)
+
+#  for idx, topic in topics:
 #     words_kr = [word.split('*')[1].replace('"', '').strip()
 #                 for word in topic.split('+')]
 #     print(f'토픽 {idx} : {words_kr}')
