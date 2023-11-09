@@ -19,9 +19,6 @@ def processingFunc(base_dir_path, effect_name, effectFunc):
             # unchanged 붙이는 거 중요
             img_obj = cv2.imread(one_img_path, cv2.IMREAD_UNCHANGED)
 
-            # 여기서 이미지에 처리할 것들 하고
-            # 지금 현재는 리사이징
-            # output_img = cv2.resize(img_obj, (350, 350))
             effected_img = effectFunc(img_obj)
 
             # 출력 폴더 생성
@@ -69,6 +66,8 @@ def resize_func(img):
 def random_rotateFunc(img):
     rows, cols = img.shape[:2]
     random_angle = np.random.randint(1, 36) * 10
+    # 첫번째: 회전 중심점, 두번째: 회전 각도,
+    # 세번째: 화면 확대/축소 비율(1은 원본, 2는 2배 0.5는 절반크기)
     M = cv2.getRotationMatrix2D((cols/2, rows/2), random_angle, 1)
     return cv2.warpAffine(img, M, (cols, rows))
 
@@ -78,7 +77,7 @@ def to_grayscale(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
-# 평탄화 시키기
+# 흑백 이미지 평탄화 시키기
 def to_flat(img):
     grayscale_img = to_grayscale(img)
     return cv2.equalizeHist(grayscale_img)
@@ -102,13 +101,9 @@ def to_hsv(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
 
-# 샤프닝
-def sharpen_image(image):
-    sharpening_kernel = np.array([[-1, -1, -1],
-                                  [-1, 9, -1],
-                                  [-1, -1, -1]])
-    sharpened = cv2.filter2D(image, -1, sharpening_kernel)
-    return sharpened
+# 미디언 블러
+def median_blur(img):
+    return cv2.medianBlur(img, 7)
 
 
 # 기하학적 변환
@@ -116,16 +111,17 @@ def sharpen_image(image):
 5. **기하학적 변환**:
     - **어파인 변환**: 이미지를 이동, 회전, 스케일링합니다.
     - **원근 변환**: 이미지의 원근 효과를 조절합니다.
-6. **세그멘테이션**:
-    - **이진화**: 임계값을 기준으로 이미지를 두 가지 값(보통 0과 255)으로 나눕니다.
-    - **물체 검출**: 이미지에서 관심 있는 영역 또는 물체를 분리합니다.
+4. **색상 및 채널 처리**:
+    - **색상 공간 변환**: RGB에서 Grayscale, HSV, LAB 등 다른 색상 공간으로 변환합니다.
+    - **채널 분할 및 결합**: 이미지의 개별 채널을 분리하거나 결합합니다.
+
 '''
 
 # 첫번째 인자: 원본이미지 있는 폴더 경로
 # 두번째 인자: 새롭게 처리되어 나올 이미지의 이름을 입력
 # 예를들어 "closing" 이라고 적으면 처리된 이미지 파일 이름은 "원본파일명_closing.jpg" 이렇게 나옴
 # 세번째 인자: 실질적으로 전처리를 하는 함수
-processingFunc("DogEmotion", "pass_origin", pass_origin)
+processingFunc("DogEmotion", "pass_origin",  pass_origin)
 
 
 # delete to_gray images but not to_flat images in this folder

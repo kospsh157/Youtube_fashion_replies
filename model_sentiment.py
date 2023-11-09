@@ -13,7 +13,7 @@ import numpy as np
 import re
 from collections import Counter
 import urllib
-
+import pickle
 
 train_file = urllib.request.urlopen(
     "https://raw.githubusercontent.com/e9t/nsmc/master/ratings_train.txt")
@@ -43,61 +43,6 @@ test_data['document'].replace('', np.nan, inplace=True)
 test_data = test_data.dropna(how='any')
 
 # 불용어 설정
-stopwords = ['의', '가', '이', '은', '들', '는', '좀', '잘',
-             '걍', '과', '도', '를', '으로', '자', '에', '와', '한', '하다']
-
-# 토큰화
-mecab = MeCab()
-X_train = []
-for sentence in train_data['document']:
-    temp_X = mecab.morphs(sentence)  # 토큰화
-    temp_X = [word for word in temp_X if not word in stopwords]  # 불용어 제거
-    X_train.append(temp_X)
-
-X_test = []
-for sentence in test_data['document']:
-    temp_X = mecab.morphs(sentence)  # 토큰화
-    temp_X = [word for word in temp_X if not word in stopwords]  # 불용어 제거
-    X_test.append(temp_X)
-
-# 토큰화된 단어 인덱스 생성
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(X_train)
-
-threshold = 3
-total_cnt = len(tokenizer.word_index)  # 단어의 수
-rare_cnt = 0  # 등장 빈도가 threshold보다 작은 단어의 개수를 카운트
-total_freq = 0  # 훈련 데이터의 전체 단어 빈도수 총 합
-rare_freq = 0  # 등장 빈도수가 threshold보다 작은 단어의 등장 빈도수의 총 합
-
-# 단어와 빈도수의 쌍(pair)를 key와 value로 받는다.
-for key, value in tokenizer.word_counts.items():
-    total_freq = total_freq + value
-
-    # 단어의 등장 빈도가 threshold보다 작으면
-    if (value < threshold):
-        rare_cnt = rare_cnt + 1
-        rare_freq = rare_freq + value
-
-vocab_size = total_cnt - rare_cnt + 1
-
-# 토큰화
-tokenizer = Tokenizer(vocab_size, oov_token='OOV')
-tokenizer.fit_on_texts(X_train)
-X_train = tokenizer.texts_to_sequences(X_train)
-X_test = tokenizer.texts_to_sequences(X_test)
-
-# 레이블 데이터 배열 변환
-y_train = np.array(train_data['label'])
-y_test = np.array(test_data['label'])
-
-# 빈 샘플 제거
-drop_train = [index for index, sentence in enumerate(
-    X_train) if len(sentence) < 1]
-X_train = np.delete(X_train, drop_train, axis=0)
-y_train = np.delete(y_train, drop_train, axis=0)
-
-
 stopwords = ['츠', '진행', '탑', '즈', '나중', '끈', '즈 ', '짐 ', '이야기 ', '츠 ', '당장 ', '슈', '나중 ', '진행 ', '하트 ', '스타일링 ', '일본 ', '지퍼 ', '슈 ', '에스 ', '카드 ', '세인 ', '끌 ', '이야기 ', '에스 ', '끈 ', '메종 ', '길이 ', '참여', '알파카', '제목', '트렌드', '완성', '사이', '포기', '장바구니', '국내', '노력', '감기',
              '예스', '효과', '세탁', '턱', '열', '얄', '일반', '보통', '연출', '블랭크', '주름', '연출', '노드', '유익', '천', '발매', '스탈', '발매', '신상',
              '쇼핑몰', '스트라이프', '수능', '이것', '걸까요', '브이', '입문', '스탠다드', '제니', '종류', '검색', '앱', '르소', '여러분', '내가', '너가', '얼마나', '얼', '폼', '품', '피', '시크', '공홈',
@@ -210,12 +155,66 @@ stopwords = ['츠', '진행', '탑', '즈', '나중', '끈', '즈 ', '짐 ', '�
              '안목', '스스', '후회', '파리', '파라', '우산', '공간', '한정', '발목', '결국', '이야기', '노래', '코인', '방', '우주', '영화', '쇼핑', '한정', '세일', '특가'
              ]
 
+# 토큰화
+mecab = MeCab()
+X_train = []
+for sentence in train_data['document']:
+    temp_X = mecab.morphs(sentence)  # 토큰화
+    temp_X = [word for word in temp_X if not word in stopwords]  # 불용어 제거
+    X_train.append(temp_X)
+
+X_test = []
+for sentence in test_data['document']:
+    temp_X = mecab.morphs(sentence)  # 토큰화
+    temp_X = [word for word in temp_X if not word in stopwords]  # 불용어 제거
+    X_test.append(temp_X)
+
+# 토큰화된 단어 인덱스 생성
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(X_train)
+
+threshold = 3
+total_cnt = len(tokenizer.word_index)  # 단어의 수
+rare_cnt = 0  # 등장 빈도가 threshold보다 작은 단어의 개수를 카운트
+total_freq = 0  # 훈련 데이터의 전체 단어 빈도수 총 합
+rare_freq = 0  # 등장 빈도수가 threshold보다 작은 단어의 등장 빈도수의 총 합
+
+# 단어와 빈도수의 쌍(pair)를 key와 value로 받는다.
+for key, value in tokenizer.word_counts.items():
+    total_freq = total_freq + value
+
+    # 단어의 등장 빈도가 threshold보다 작으면
+    if (value < threshold):
+        rare_cnt = rare_cnt + 1
+        rare_freq = rare_freq + value
+
+vocab_size = total_cnt - rare_cnt + 1
+
+# 토큰화
+tokenizer = Tokenizer(vocab_size, oov_token='OOV')
+tokenizer.fit_on_texts(X_train)
+X_train = tokenizer.texts_to_sequences(X_train)
+X_test = tokenizer.texts_to_sequences(X_test)
+
+# Tokenizer 객체를 파일로 저장합니다.
+with open('tokenizer.pickle', 'wb') as handle:
+    pickle.dump(tokenizer, handle, protocol=pickle.HIGHEST_PROTOCOL)
+
+# 레이블 데이터 배열 변환
+y_train = np.array(train_data['label'])
+y_test = np.array(test_data['label'])
+
+# 빈 샘플 제거
+drop_train = [index for index, sentence in enumerate(
+    X_train) if len(sentence) < 1]
+X_train = np.delete(X_train, drop_train, axis=0)
+y_train = np.delete(y_train, drop_train, axis=0)
+
 
 # 패딩
 max_len = 60
 X_train = pad_sequences(X_train, maxlen=max_len)
 X_test = pad_sequences(X_test, maxlen=max_len)
-
 
 # 모델 정의
 model = Sequential()

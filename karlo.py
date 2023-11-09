@@ -11,12 +11,10 @@ REST_API_KEY = 'ada696dfddc16d1227e321d7574f06c1'
 
 
 def t2i(fashion_items, negative_prompt):
-    combined_srt = ", ".join(fashion_items)
-    prompt = '''
-        A male model is wearing the following clothes, ",
-    '''
-
-    prompt += combined_srt
+    # combined_srt = ", ".join(fashion_items)
+    prompt = "Generate a realistic image of a well-groomed male model on a simple urban street, showcasing " + \
+        ", ".join(fashion_items) + ". The items should be sharply in focus, capturing their texture and fit in a real-world setting. The model's appearance is natural and photorealistic, with a poised demeanor that complements the understated street scene. The lighting and composition should resemble a high-quality photograph, avoiding any cartoonish or cybernetic aesthetic, to truly emphasize the fashion items in a contemporary, believable manner."
+    # prompt += combined_srt
 
     r = requests.post(
         'https://api.kakaobrain.com/v2/inference/karlo/t2i',
@@ -39,9 +37,9 @@ def t2i(fashion_items, negative_prompt):
 
 negative_prompt = "sleeping cat, dog, ugly face, cropped"
 
-# 이미지 생성하기 REST API 호출
+# # 이미지 생성하기 REST API 호출
 # response = t2i(
-#     "blue shirt, beige pants, black shoes, layered white-T.", negative_prompt)
+#     ["blue shirt", "beige pants", "black shoes", "layered white-T"], negative_prompt)
 
 # # 응답의 첫 번째 이미지 생성 결과 출력하기
 # result = Image.open(urllib.request.urlopen(

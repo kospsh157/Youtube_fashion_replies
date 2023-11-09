@@ -1,9 +1,13 @@
 # coding: utf-8
 
+from DB_connector import get_db_connection
+import re
+from keras.models import load_model
+import pickle
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 import time
-
+import pandas as pd
 import gensim
 from konlpy.tag import Mecab
 from gensim import corpora
@@ -21,6 +25,19 @@ from papago import translate_with_papago
 # 띄어쓰기 정형화 된 것들 다시 불러와서 데이타프레임으로 저장
 rows = select_normalized(['title', 'comments'])
 df = pd.DataFrame(rows, columns=['Title', 'Comments'])
+
+# 널값 제거
+df['Comments'].dropna(inplace=True)
+
+
+def filter_comments(comments):
+    return [comment for comment in comments if comment not in [None, '', ' ', '  ']]
+
+
+# 'Comments' 컬럼에 있는 각 리스트를 filter_comments 함수에 적용하여 새로운 'filtered_Comments' 컬럼을 생성합니다.
+df['filtered_Comments'] = df['Comments'].apply(filter_comments)
+
+
 # 토큰화
 stopwords = ['츠', '진행', '탑', '즈', '나중', '끈', '즈 ', '짐 ', '이야기 ', '츠 ', '당장 ', '슈', '나중 ', '진행 ', '하트 ', '스타일링 ', '일본 ', '지퍼 ', '슈 ', '에스 ', '카드 ', '세인 ', '끌 ', '이야기 ', '에스 ', '끈 ', '메종 ', '길이 ', '참여', '알파카', '제목', '트렌드', '완성', '사이', '포기', '장바구니', '국내', '노력', '감기',
              '예스', '효과', '세탁', '턱', '열', '얄', '일반', '보통', '연출', '블랭크', '주름', '연출', '노드', '유익', '천', '발매', '스탈', '발매', '신상',
@@ -143,79 +160,86 @@ for word in stopwords:
     new_stopwords.append(' ' + word + ' ')
 
 
-# 토큰화 및 불용어 제외 (이거는 단어용)
-# tagger = MeCab()
+max_len = 60
+mecab = MeCab()
 
-# title_tokened = []
-# for comments in df['Comments']:
-#     for comment in comments:
-#         tokened_words = tagger.nouns(comment)
-
-#         print(f'불용어 필터 이후 문장들 지금은 토큰화x (다음 아래 있는 단어들 줄에 패션 아이템 아닌것 삭제)')
-#         tokend = [word for word in tokened_words if not word in new_stopwords]
-
-#         print(tokend)
-
-#         print(
-#             f'불용어에서 있는 단어들:{[word for word in tokend if word in new_stopwords]}')
-#         title_tokened.append(tokend)
+# 파일로부터 Tokenizer 객체를 다시 로드합니다.
+with open('tokenizer.pickle', 'rb') as handle:
+    tokenizer = pickle.load(handle)
 
 
-# 토큰화
+# 저장된 .h5 파일로부터 모델을 로드합니다.
+model = load_model('my_model.h5')
 
-stopwords_for_sentiment = ['의', '이', '가', '은', '들', '는', '과', '하다', '한다', '에', '에서', '로', '으로', '와', '도', '한', '를',
-                           '되', '돼', '호', '의', '에서', '와', '크', '합니다', '을', '를', '왜', '은', '는', '도', '또', '항상', '항시', '또', '함', '해', '하', '헐', '밈',
-                           '축', '환', '옷', '응', '잉', '하', 'ㅋ', 'ㅎ', 'ㅋㅋ', 'ㅋㅋㅋ', 'ㅎㅎ', 'ㅎㅎㅎ', 'ㅋㅋㅋㅋ', 'ㅎㅎㅎㅎ', '쇼', '해요', '하요', '합시다']
 
-tagger = MeCab()
+def sent_pred(sent):
+    sent = re.sub(r'[^ㄱ-ㅎㅏ-ㅣ가-힣 ]', '', sent)
+    sent_morphs = mecab.morphs(sent)  # 토큰화
+    sent_morphs = [
+        word for word in sent_morphs if word not in new_stopwords]  # 불용어 제거
+    encoded = tokenizer.texts_to_sequences([sent_morphs])  # 정수 인코딩
+    pad_new = pad_sequences(encoded, maxlen=max_len)  # 패딩
+    score = float(model.predict(pad_new))  # 예측
+
+    if score > 0.5:
+        print("{} => 긍정({:.2f}%)" .format(sent, score * 100))
+    else:
+        print("{} => 부정({:.2f}%)" .format(sent, (1 - score) * 100))
+
+    return score
+
 
 total_comments = []
-for sentences_of_one in df['Comments']:
-    for comment in sentences_of_one:
-        total_comments.append([word for word in tagger.morphs(
-            comment) if not word in stopwords_for_sentiment])
-
-# 위에서 토큰화 된거에 인덱싱하기
-tokenizer = Tokenizer()
-tokenizer.fit_on_texts(total_comments)
-
-print(tokenizer.word_index)
+for comments_of_one in df['filtered_Comments']:
+    for comment in comments_of_one:
+        if sent_pred(comment) > 0.5:
+            total_comments.append(comment)
 
 
-# 낮은 빈도수 제거
-threshold = 3
-words_cnt = len(tokenizer.word_index)
-rare_cnt = 0
+# 시간이 너무 오래 걸리니깐 그냥 긍정적으로 나온 댓글들을 따로 DB에 저장하자
+conn = get_db_connection()
+cursor = conn.cursor()
 
-words_freq = 0
-rare_freq = 0
+for comment in total_comments:
+    insert_query = """
+        INSERT INTO positive_comments (comment)
+        VALUES (%(comment)s);
+        """
+    cursor.execute(insert_query, {'comment': comment})
 
-for key, value in tokenizer.word_counts.items():
-    words_freq = words_freq + value
-
-    if value < threshold:
-        rare_cnt += 1
-        rare_freq = rare_freq + value
-
-
-print("전체 단어 수: ", words_cnt)
-print("빈도가 {}미만인 단어 수: {}".format(threshold-1, rare_cnt), words_cnt)
-print('희귀 단어 비율: {}'.format((rare_cnt / words_cnt) * 100))
-print('회귀 단어 등장 빈도 비율 {}'.format((rare_freq / words_freq) * 100))
-
-# 실제 사용하는 단어 수
-vocab_size = words_cnt - rare_cnt
-print('실제사용하는 단어 수: ', vocab_size)
+cursor.commit()
+cursor.close()
+conn.close()
 
 
-# 인덱싱한것을 정수 시퀀스로
+# 이제 위 에거 이후 부터는 DB 에서 바로 불러다 쓰자
+conn = get_db_connection()
+cursor = conn.cursor()
+
+cursor.execute("select comment from positive_comments")
+rows = cursor.fetchall()
+
+cursor.close()
+conn.close()
+
+
+print(rows)
+
+# 토큰화 및 불용어 제외 (이거는 단어용)
+tagger = MeCab()
+tokend_total_comments = []
+for comment in rows:
+    tokened_words = tagger.nouns(comment[0])
+    tokend = [word for word in tokened_words if not word in new_stopwords]
+    tokend_total_comments.append(tokend)
 
 
 # 단어 사전 생성
-dictionary = corpora.Dictionary(title_tokened)
+dictionary = corpora.Dictionary(tokend_total_comments)
 
 # 문서-단어 매트릭스 생성
-corpus = [dictionary.doc2bow(text) for text in title_tokened]
+corpus = [dictionary.doc2bow(text) for text in tokend_total_comments]
+
 
 time1 = time.time()
 
@@ -239,19 +263,19 @@ time2 = time.time()
 
 print('걸린시간:', time2 - time1)
 
-#  for idx, topic in topics:
-#     words_kr = [word.split('*')[1].replace('"', '').strip()
-#                 for word in topic.split('+')]
-#     print(f'토픽 {idx} : {words_kr}')
+for idx, topic in topics:
+    words_kr = [word.split('*')[1].replace('"', '').strip()
+                for word in topic.split('+')]
+    print(f'토픽 {idx} : {words_kr}')
 
-#     # 번역
-#     words_en = translate_with_papago(words_kr)
+    # 번역
+    words_en = translate_with_papago(words_kr)
 
-#     print(words_en)
-#     response = t2i(words_en, negative_prompt)
-#     result = Image.open(urllib.request.urlopen(
-#         response.get("images")[0].get("image")))
-#     result.show()
+    print(words_en)
+    response = t2i(words_en, negative_prompt)
+    result = Image.open(urllib.request.urlopen(
+        response.get("images")[0].get("image")))
+    result.show()
 
 
 # 새로운 문서에 대한 토픽 분포 예측
