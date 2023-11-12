@@ -12,9 +12,11 @@ def making_prompt(fashion_items):
 
     res = client.completions.create(
         model="text-davinci-003",
-        prompt=f"Here are some fashion-related keywords,{fashion_items}. I want you to use these keywords to create an image of a single model, fully dressed in these fashion items from head to toe, ensuring the entire outfit is visible and presented elegantly. The model should be an adult and the attire should be tasteful and appropriate, with no explicit or excessive exposure. If the styling is feminine, the model should be a woman; if the styling is masculine, the model should be a man. Please avoid featuring children or elderly models, and ensure the focus is on showcasing the fashion items respectfully.",
-        max_tokens=250,
-        temperature=0.5
+        prompt=f"Visualize an adult model in a sophisticated and stylish outfit, corresponding to the gender associated with the fashion items: {fashion_items}. The model should epitomize attractiveness and charm, similar to professional models. Ensure the outfit is tastefully chosen without duplication, reflecting a harmonious style and color palette. The model's portrayal should be dignified and elegant, avoiding any explicit or inappropriate content, and should present a realistic and appealing representation of fashion. The full outfit needs to be visible in a full-body depiction, suitable for all audiences.",
+        max_tokens=300,
+        temperature=0.6
     )
+
+    print(res)
     print(res.choices[0].text.strip())
     return res.choices[0].text.strip()
