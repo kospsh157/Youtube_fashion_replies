@@ -228,6 +228,7 @@ def not_in_keywords(comments, keywords):
     for comment in comments:
         if not all(keyword in comment for keyword in keywords):
             no_items.append(comment)
+    return no_items
 
 # 키워드를 포함하는 댓글 필터링
 
@@ -284,7 +285,7 @@ df_combined = pd.concat(
 # 빈도수 낮은 단어들을 찾기 위한 토큰화 과정
 mecab = MeCab()
 temp = []
-for sentence in normarlized_comments:
+for sentence in df_combined['comment']:
     temp_X = mecab.morphs(sentence)
     temp_X = [word for word in temp_X if not word in new_stopwords]  # 불용어 제거
     temp.append(temp_X)
@@ -317,7 +318,7 @@ vocab_size = total_cnt - rare_cnt
 
 # 정규화까지 진행된 댓글리스트를 다시 가져와서 0~4까지 분류
 temp_2 = []
-for sentence in normarlized_comments:
+for sentence in df_combined['comment']:
     temp_X = mecab.morphs(sentence)
     temp_X = [word for word in temp_X if not word in new_stopwords]  # 불용어 제거
     temp_2.append(temp_X)
