@@ -15,9 +15,9 @@ negative_prompt = "news paper, children, old people, elder people, baby, sleepin
     Toys, Books, Music items, sports equipment, pet supplies, gardening supplies, artwork, office supplies, building materials, outdoor activity gear"
 
 
-def t2i(keywords):
-    list_of_keywords = ", ".join(keywords)
-    prompt = making_prompt(list_of_keywords)
+def t2i(prompt):
+    # list_of_keywords = ", ".join(keywords)
+    # prompt = making_prompt(list_of_keywords)
     # prompt = "A stylish model is wearing a vintage-style denim jacket. The jacket is decorated with a check pattern and is layered with a slim fit white t-shirt underneath. The model is wearing a comfortable jumper and a casual cap on her head. Overall, this combination expresses a classic yet modern sensibility, and the long sleeves of the jacket and the slim silhouette of the jumper stand out in particular."
 
     r = requests.post(

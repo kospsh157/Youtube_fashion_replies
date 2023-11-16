@@ -265,19 +265,18 @@ corpus = [gensim_dictionary.doc2bow(text) for text in filtered_temp]
 time1 = time.time()
 
 # LDA 모델 학습
-num_topics = 5
+num_topics = 10
 lda_model = gensim.models.LdaModel(
     corpus, num_topics=num_topics, id2word=gensim_dictionary, passes=15)
 
 
 # 학습된 토픽들 출력
-topics = lda_model.print_topics(num_words=15)
+topics = lda_model.print_topics(num_words=5)
 for topic in topics:
     print(topic)
 
 
 time2 = time.time()
-
 
 print('걸린시간:', time2 - time1)
 
@@ -289,7 +288,7 @@ for idx, topic in topics:
     # 번역
     words_en = translate_with_papago(words_kr)
 
-    print(words_en)
+    # print(words_en)
     response = t2i(words_en)
     result = Image.open(urllib.request.urlopen(
         response.get("images")[0].get("image")))
