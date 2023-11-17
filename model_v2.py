@@ -245,32 +245,32 @@ for word in stopwords:
 # Pandas DataFrame을 PostgreSQL 테이블에 삽입하는 함수
 
 
-def insert_into_table(conn, df, table):
-    """
-    데이터프레임의 데이터를 PostgreSQL 테이블에 INSERT 쿼리를 사용하여 삽입
-    """
-    cursor = conn.cursor()
+# def insert_into_table(conn, df, table):
+#     """
+#     데이터프레임의 데이터를 PostgreSQL 테이블에 INSERT 쿼리를 사용하여 삽입
+#     """
+#     cursor = conn.cursor()
 
-    # INSERT 쿼리의 칼럼 부분과 값 부분을 정의
-    # 예를 들어, 데이터프레임에 'label'과 'text'라는 두 개의 칼럼이 있다고 가정
-    columns = ', '.join(df.columns)  # 'label, text'
-    placeholders = ', '.join(['%s'] * len(df.columns))  # '%s, %s'
+#     # INSERT 쿼리의 칼럼 부분과 값 부분을 정의
+#     # 예를 들어, 데이터프레임에 'label'과 'text'라는 두 개의 칼럼이 있다고 가정
+#     columns = ', '.join(df.columns)  # 'label, text'
+#     placeholders = ', '.join(['%s'] * len(df.columns))  # '%s, %s'
 
-    query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
+#     query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
 
-    for index, row in df.iterrows():
-        try:
-            # row.values는 데이터프레임 행의 모든 값을 포함하는 배열입니다.
-            cursor.execute(query, tuple(row.values))
-            conn.commit()
-        except (Exception, psycopg2.DatabaseError) as error:
-            print(f"Error: {error}")
-            conn.rollback()
-            cursor.close()
-            return 1
+#     for index, row in df.iterrows():
+#         try:
+#             # row.values는 데이터프레임 행의 모든 값을 포함하는 배열입니다.
+#             cursor.execute(query, tuple(row.values))
+#             conn.commit()
+#         except (Exception, psycopg2.DatabaseError) as error:
+#             print(f"Error: {error}")
+#             conn.rollback()
+#             cursor.close()
+#             return 1
 
-    print("Data inserted successfully")
-    cursor.close()
+#     print("Data inserted successfully")
+#     cursor.close()
 
 
 # 데이터프레임을 PostgreSQL 테이블에 삽입
@@ -308,11 +308,11 @@ conn.close()
 
 
 # 결과 확인
-# print("Tops:", tops)
-# print("Bottoms:", bottoms)
-# print("Outer:", outer)
-# print("Shoes:", shoes)
-# print("Accessory:", accessory)
+print("Tops:", len(tops))
+print("Bottoms:", len(bottoms))
+print("Outer:", len(outer))
+print("Shoes:", len(shoes))
+print("Accessory:", len(accessory))
 
 
 # 이제 이것들을 LDA모델에 보내서 키워드를 추출 하자
@@ -336,7 +336,7 @@ def lda(item_list):
     # 임계값 이하의 빈도수를 가진 단어 제거
     # 여기서 TEMP는 하나의 댓글이 토큰화된 리스트 ["안녕", "나는", "성호다"] 가 여러개 뭉쳐 있는 형태이고
     # TEXT는 댓글 하나를 의미한다.
-    threshold = 20
+    threshold = 10
     filtered_temp = [
         [word for word in text if word_freq[word] >= threshold] for text in temp]
 
@@ -344,6 +344,7 @@ def lda(item_list):
     gensim_dictionary = corpora.Dictionary(filtered_temp)
 
     # 문서-단어 매트릭스 생성
+
     corpus = [gensim_dictionary.doc2bow(text) for text in filtered_temp]
 
     time1 = time.time()
@@ -354,7 +355,7 @@ def lda(item_list):
         corpus, num_topics=num_topics, id2word=gensim_dictionary, passes=15)
 
     # 학습된 토픽들 출력
-    topics = lda_model.print_topics(num_words=7)
+    topics = lda_model.print_topics(num_words=15)
     for topic in topics:
         print(topic)
 
@@ -383,26 +384,15 @@ outer = lda(outer)
 shoes = lda(shoes)
 accessory = lda(accessory)
 
-styling = making_prompt(tops, bottoms, outer, shoes, accessory)
-print('완성된 스타일링: ', styling)
-making_img(styling)
+print(tops)
+print(bottoms)
+print(outer)
+print(shoes)
+print(accessory)
 
 
-styling2 = making_prompt(tops, bottoms, outer, shoes, accessory)
-print('완성된 스타일링: ', styling2)
-making_img(styling2)
-
-
-styling3 = making_prompt(tops, bottoms, outer, shoes, accessory)
-print('완성된 스타일링: ', styling3)
-making_img(styling3)
-
-
-styling4 = making_prompt(tops, bottoms, outer, shoes, accessory)
-print('완성된 스타일링: ', styling4)
-making_img(styling4)
-
-
-styling5 = making_prompt(tops, bottoms, outer, shoes, accessory)
-print('완성된 스타일링: ', styling5)
-making_img(styling5)
+call_cnt = 5
+for num in range(call_cnt):
+    styling = making_prompt(tops, bottoms, outer, shoes, accessory)
+    print('프롬프트: ', styling)
+    making_img(styling)
