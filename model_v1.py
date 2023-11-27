@@ -327,47 +327,47 @@ print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@vacab_size는@@@@@@@@@@@@@@@@@@@@@2 : ', vo
 
 
 # # 정규화까지 진행된 댓글리스트를 다시 가져와서 0~4까지 분류
-# temp_2 = []
-# for sentence in df_combined['comment']:
-#     temp_X = mecab.morphs(sentence)
-#     temp_X = [word for word in temp_X if not word in new_stopwords]  # 불용어 제거
-#     temp_2.append(temp_X)
+temp_2 = []
+for sentence in df_combined['comment']:
+    temp_X = mecab.morphs(sentence)
+    temp_X = [word for word in temp_X if not word in new_stopwords]  # 불용어 제거
+    temp_2.append(temp_X)
 
 
-# tokenizer = Tokenizer(num_words=vocab_size)
-# tokenizer.fit_on_texts(temp_2)
+tokenizer = Tokenizer(num_words=vocab_size)
+tokenizer.fit_on_texts(temp_2)
 
-# # 텍스트 시퀀스를 정수 시퀀스로 변환
-# sequences = tokenizer.texts_to_sequences(temp_2)
+# 텍스트 시퀀스를 정수 시퀀스로 변환
+sequences = tokenizer.texts_to_sequences(temp_2)
 
-# # 패딩
-# max_sequence_length = 150
-# padded_sequences = pad_sequences(sequences, maxlen=max_sequence_length)
-
-
-# # 레이블 추출
-# labels = df_combined['label'].values
+# 패딩
+max_sequence_length = 150
+padded_sequences = pad_sequences(sequences, maxlen=max_sequence_length)
 
 
-# # 모델 구축
-# print('어휘사전 개수:', vocab_size)
-# model = Sequential()
-# model.add(Embedding(input_dim=vocab_size, output_dim=128,
-#           input_length=max_sequence_length))
-# model.add(Bidirectional(LSTM(128, dropout=0.2, recurrent_dropout=0.2)))
-# model.add(Dense(6, activation='softmax'))  # 5개의 출력 클래스
-
-# # 모델 컴파일
-# model.compile(loss='sparse_categorical_crossentropy',
-#               optimizer='adam', metrics=['accuracy'])
+# 레이블 추출
+labels = df_combined['label'].values
 
 
-# # 훈련 데이터와 테스트 데이터 분리
-# X_train, X_test, y_train, y_test = train_test_split(
-#     padded_sequences, labels, test_size=0.20, random_state=42)
+# 모델 구축
+print('어휘사전 개수:', vocab_size)
+model = Sequential()
+model.add(Embedding(input_dim=vocab_size, output_dim=128,
+          input_length=max_sequence_length))
+model.add(Bidirectional(LSTM(128, dropout=0.2, recurrent_dropout=0.2)))
+model.add(Dense(6, activation='softmax'))  # 5개의 출력 클래스
+
+# 모델 컴파일
+model.compile(loss='sparse_categorical_crossentropy',
+              optimizer='adam', metrics=['accuracy'])
 
 
-# time5 = time.time()
+# 훈련 데이터와 테스트 데이터 분리
+X_train, X_test, y_train, y_test = train_test_split(
+    padded_sequences, labels, test_size=0.20, random_state=42)
+
+
+time5 = time.time()
 
 # # 모델 학습
 # model.fit(X_train, y_train, batch_size=32, epochs=10,
@@ -450,3 +450,10 @@ def copy_from_stringio(conn, df, table):
 
 # 데이터프레임을 PostgreSQL 테이블에 삽입
 copy_from_stringio(conn, classified_comments_df, 'classified_comments')
+
+
+# 파이썬 3.9 설치 텐서플로우 2.11.1 설치, 해야함 박경준 띄어쓰기 정규화 설치하려면.....
+
+
+
+ 
