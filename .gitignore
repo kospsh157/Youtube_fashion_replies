@@ -5,3 +5,4 @@ images/
 *.zip
 DogEmotion_copy/ 
 DogEmotion*/
+*.env
