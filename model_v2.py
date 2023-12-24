@@ -280,7 +280,7 @@ for word in stopwords:
 conn = get_db_connection()
 cursor = conn.cursor()
 # SQL 쿼리 실행하여 데이터 가져오기
-sql = "SELECT id, comment, label FROM classified_comments"
+sql = "SELECT comment, label FROM classified_comments"
 cursor.execute(sql)
 # 라벨에 따라 데이터 분류
 tops = []
@@ -290,7 +290,7 @@ shoes = []
 accessory = []
 
 for record in cursor.fetchall():
-    id, comment, label = record
+    comment, label = record
     if label == 0:
         tops.append(comment)
     elif label == 1:
