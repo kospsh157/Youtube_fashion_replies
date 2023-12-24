@@ -1,3 +1,4 @@
+from useModel_v3 import predict, fashion_item_classifier_model, text_pipeline, classifier_category
 from making_prompt import making_prompt
 import time
 import pandas as pd
@@ -145,20 +146,20 @@ for word in stopwords:
     new_stopwords.append(' ' + word + ' ')
 
 
-# # 이제 위 에거 이후 부터는 DB 에서 바로 불러다 쓰자
-# conn = get_db_connection()
-# cursor = conn.cursor()
+# 이제 위 에거 이후 부터는 DB 에서 바로 불러다 쓰자
+conn = get_db_connection()
+cursor = conn.cursor()
 
-# cursor.execute("select comment from positive_comments")
-# rows = cursor.fetchall()
+cursor.execute("select comment from positive_comments")
+rows = cursor.fetchall()
 
-# cursor.close()
-# conn.close()
+cursor.close()
+conn.close()
 
 
 # 이제 불러다가 쓰기 전에, 중복제거를 좀 해야 함
 # set함수를 사용하여 중복제거, 단 순서는 유지 안됨.
-# unique_comments = list(set(rows))
+unique_comments = list(set(rows))
 
 
 # # 빈도수 낮은 단어들을 찾기 위한 토큰화 과정
@@ -277,50 +278,12 @@ for word in stopwords:
 # insert_into_table(conn, classified_comments_df, 'classified_comments')
 
 
-conn = get_db_connection()
-cursor = conn.cursor()
-# SQL 쿼리 실행하여 데이터 가져오기
-sql = "SELECT comment, label FROM classified_comments"
-cursor.execute(sql)
-# 라벨에 따라 데이터 분류
-tops = []
-bottoms = []
-outer = []
-shoes = []
-accessory = []
-
-for record in cursor.fetchall():
-    comment, label = record
-    if label == 0:
-        tops.append(comment)
-    elif label == 1:
-        bottoms.append(comment)
-    elif label == 2:
-        outer.append(comment)
-    elif label == 3:
-        shoes.append(comment)
-    elif label == 4:
-        accessory.append(comment)
-
-# 연결 종료
-cursor.close()
-conn.close()
-
-
-# 결과 확인
-print("Tops:", len(tops))
-print("Bottoms:", len(bottoms))
-print("Outer:", len(outer))
-print("Shoes:", len(shoes))
-print("Accessory:", len(accessory))
-
-
 # 이제 이것들을 LDA모델에 보내서 키워드를 추출 하자
 
-def lda(item_list):
+def lda(comment_list):
     temp = []
-    for sentence in item_list:
-        temp_X = mecab1.nouns(sentence)  # 명사만 뽑는다.
+    for sentence in comment_list:
+        temp_X = mecab1.nouns(sentence[0])  # 명사만 뽑는다.
         temp_X = [word for word in temp_X if not word in new_stopwords]  # 불용어 제거
         temp.append(temp_X)
 
@@ -350,9 +313,9 @@ def lda(item_list):
     time1 = time.time()
 
     # LDA 모델 학습
-    num_topics = 1
+    num_topics = 5
     lda_model = gensim.models.LdaModel(
-        corpus, num_topics=num_topics, id2word=gensim_dictionary, passes=15)
+        corpus, num_topics=num_topics, id2word=gensim_dictionary, passes=30)
 
     # 학습된 토픽들 출력
     topics = lda_model.print_topics(num_words=15)
@@ -378,21 +341,26 @@ def making_img(prompt):
     result.show()
 
 
-tops = lda(tops)
-bottoms = lda(bottoms)
-outer = lda(outer)
-shoes = lda(shoes)
-accessory = lda(accessory)
-
-print(tops)
-print(bottoms)
-print(outer)
-print(shoes)
-print(accessory)
+# DB에서 긍정적인 댓글로 분류된 댓글들만 가져와서
+# lda를 통해 패션 키워드만 뽑는다.
+fashion_keywords = lda(unique_comments)
 
 
-call_cnt = 5
-for num in range(call_cnt):
-    styling = making_prompt(tops, bottoms, outer, shoes, accessory)
+for topic in fashion_keywords:
+    predicted_class = predict(
+        topic, fashion_item_classifier_model, text_pipeline)
+
+    top_keywords, bottom_keywords, outer_keywords, shoes_keywords, accessary_keywords, not_fashion_items = classifier_category(
+        predicted_class)
+
+    print('다음 아래 확인해')
+
+    print(top_keywords, bottom_keywords, outer_keywords,
+          shoes_keywords, accessary_keywords, not_fashion_items)
+
+    # call_cnt = 5
+    # for num in range(call_cnt):
+    styling = making_prompt(top_keywords, bottom_keywords,
+                            outer_keywords, shoes_keywords, accessary_keywords)
     print('프롬프트: ', styling)
     making_img(styling)
