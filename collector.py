@@ -68,7 +68,7 @@ def change_api_key(api_number):
 
 
 class GetYoutubeComments:
-    # API key 받아오기s
+    # API key 받아오기
     load_dotenv('api.env')
     API_KEY1 = os.getenv('youtube_API_KEY1')
     API_KEY2 = os.getenv('youtube_API_KEY2')

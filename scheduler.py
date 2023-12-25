@@ -15,6 +15,8 @@ def job():
         # 여기에 유튜브 댓글을 수집하는 함수를 호출
         two_days_ago = current_time_in_korea - timedelta(days=2)
         formatted_date = two_days_ago.strftime('%Y-%m-%d')
+
+        # ('검색 키워드', 'api 넘버', '시작 날짜')
         GetYoutubeComments('패션', 1, formatted_date)
 
 

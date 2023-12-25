@@ -4,6 +4,9 @@ from dateutil.relativedelta import relativedelta
 from getReply import getReply
 from DB_injector import insert_video_data
 from DB_retriever import get_channel_ids
+from DB_connector import get_db_connection
+from DB_SERVER_connector import DB_server_connentor
+
 '''
 구글api는 한번 쿼리를 날리면 500개의 검색결과를 찾는다. 이 수는 500개로 정해져있다. 
 날짜 파라미터를 사용해서 여러번 호출하면 데이터를 모을 수 있다. 
@@ -158,7 +161,21 @@ print('총 비디오 데이터 개수: ', len(sorted_video_data))
 
 
 # 비디오 데이타 삽입
-insert_video_data(sorted_video_data, SEARCH_KEYWORD)
+# db에 한다고 쳐도 일단 로컬에도 똑같이 저장해야 하기 때문에 같이 불러야 한다.
+try:
+    insert_video_data(sorted_video_data, SEARCH_KEYWORD, get_db_connection)
+except Exception as e:
+    print('로컬 데이터 삽입중에 에러 발생: ', e)
+
+
+
+
+# try:
+#     # 로컬 DB서버에 데이타 삽입
+#     insert_video_data(video_dats_list, query, DB_server_connentor)
+# except Exception as e:
+#     print('DB서버에 데이터 삽입중에 에러 발생: ', e)
+
 
 
 # 주기적으로 함수를 실행하고 그럼 api서버가 따로 있어야 하고 거기서 댓글을 주기적으로 모으고 다시 db서버로 전달한다.

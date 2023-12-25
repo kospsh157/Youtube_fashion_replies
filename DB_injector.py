@@ -23,9 +23,13 @@ CREATE TABLE channels (
 
 '''
 
+# 유튜브에서 원시 데이터(댓글) 긁어온거 db에 저장하기 
+# 여기서 파라미터query는 유튜브에서 영상을 '어떤 키워드로' 검색했는지다. 
+# '패션'으로 검색을 했겠지만 필요에 의해선 다른 걸 검색해야 할수도 있으니..만들었던 것이다.
+# connetor는 로컬과 로컬db서버를 구분하기위해 커넥터를 다르게 넣어줄수있도록 한것이다.
+def insert_video_data(video_data_list, query, connentor):
 
-def insert_video_data(video_data_list, query):
-    connection = get_db_connection()
+    connection = connentor()
     cursor = connection.cursor()
 
     for item in video_data_list:
