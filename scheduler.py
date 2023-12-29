@@ -14,6 +14,7 @@ def job():
     if current_date_in_korea.day % 2 == 0:
         # 여기에 유튜브 댓글을 수집하는 함수를 호출
         two_days_ago = current_time_in_korea - timedelta(days=2)
+        # 수집 시작 날짜는 현재 날짜에서 2일 전이어야함.
         formatted_date = two_days_ago.strftime('%Y-%m-%d')
 
         # ('검색 키워드', 'api 넘버', '시작 날짜')

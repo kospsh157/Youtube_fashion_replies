@@ -360,7 +360,7 @@ for topic in fashion_keywords:
 
     # call_cnt = 5
     # for num in range(call_cnt):
-    styling = making_prompt(top_keywords, bottom_keywords,
-                            outer_keywords, shoes_keywords, accessary_keywords)
-    print('프롬프트: ', styling)
-    making_img(styling)
+    styling_prompt = making_prompt(top_keywords, bottom_keywords,
+                                   outer_keywords, shoes_keywords, accessary_keywords)
+    print('프롬프트: ', styling_prompt)
+    making_img(styling_prompt)

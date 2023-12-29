@@ -11,27 +11,35 @@ client = OpenAI(
 def making_prompt(tops, bottoms, outers, shoes, accessory):
     res1 = client.completions.create(
         model="text-davinci-003",
-        prompt=f'Im going to provide you with five fashion items: a top({tops}), bottom({bottoms}), outerwear({outers}), shoes({shoes}), and accessories({accessory}). \
-            Please choose one from each category and create a modern, attractive styling with careful attention to color coordination. \
-                최종결과는 패션 아이템 목록이어야해 (색상,재질)상의, (색상,재질)하의, (색상,재질)아우터, (색상,재질)신발, 악세사리 순서로. 단, 영어로 답변해줘.',
+        prompt=f"I will provide you with five fashion items: a top ({tops}), bottom ({bottoms}), outerwear ({outers}), shoes ({shoes}), and accessories ({accessory}). \
+            Please select one item from each category and devise a contemporary, appealing ensemble with a keen focus on color coordination. \
+                Additionally, based on the chosen fashion items, decide whether a male or female model would best showcase the outfit. \
+                    Your final response should be in English, detailing the model's gender, \
+                        and the selected items in the order of top (color, material), bottom (color, material), outerwear (color, material), shoes (color, material), and accessory.",
         max_tokens=200,
-        temperature=0.7
+        temperature=0.5
     )
 
     result = res1.choices[0].text.strip()
     print(result)
 
-    res2 = client.completions.create(
-        model="text-davinci-003",
-        prompt=f"Visualize an adult model in a sophisticated and stylish outfit, corresponding to the gender associated with the fashion items: {result}. \
-            The model should epitomize attractiveness and charm, similar to professional models. \
-                Ensure the outfit is tastefully chosen without duplication, reflecting a harmonious style and color palette. \
-                    The model's portrayal should be dignified and elegant, avoiding any explicit or inappropriate content, and should present a realistic and appealing representation of fashion. \
-                        The full outfit needs to be visible in a full-body depiction(including shoes), suitable for all audiences.",
-        max_tokens=300,
-        temperature=0.5
-    )
+    prompt_2 = f"Please provide a full-length image of a professional fashion model featuring the specified items: {result}, \
+        set against an outdoor backdrop. The model should be captured from head to toe,\
+          including clearly visible footwear as it's an integral part of the fashion items. \
+            Ensure the model is depicted with a natural human figure, specifically with two arms, \
+                to avoid any unnatural representations. The setting should complement the fashion, \
+                    with the model embodying the essence of modern style in the outdoor environment."
+    # res2 = client.completions.create(
+    #     model="text-davinci-003",
+    #     prompt=f"Visualize an adult model in a sophisticated and stylish outfit, corresponding to the gender associated with the fashion items: {result}. \
+    #         The model should epitomize attractiveness and charm, similar to professional models. \
+    #             Ensure the outfit is tastefully chosen without duplication, reflecting a harmonious style and color palette. \
+    #                 The model's portrayal should be dignified and elegant, avoiding any explicit or inappropriate content, and should present a realistic and appealing representation of fashion. \
+    #                     The full outfit needs to be visible in a full-body depiction(including shoes), suitable for all audiences.",
+    #     max_tokens=300,
+    #     temperature=0.5
+    # )
 
     # print(res)
-    # print(res.choices[0].text.strip())
-    return res2.choices[0].text.strip()
+    return prompt_2
+    # return res2.choices[0].text.strip()
