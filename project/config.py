@@ -12,7 +12,7 @@ GOOGLE_API_4 = os.getenv('GOOGLE_API_4')
 
 OPEN_API = os.getenv('OPEN_API')
 
-kakao_kalro = os.getenv('kakao_kalro')
+KAKAO_KALRO = os.getenv('KAKAO_KALRO')
 
-papago_id = os.getenv('papago_id')
-papago_secret = os.getenv('papago_secret')
+PAPAGO_ID = os.getenv('PAPAGO_ID')
+PAPAGO_CLIENT = os.getenv('PAPAGO_CLIENT')
