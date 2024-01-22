@@ -1,8 +1,11 @@
 import requests
 
+from config import PAPAGO_ID
+from config import PAPAGO_CLIENT
+
 # 파파고 키
-client_id = "8zyFrQmcAHuJWA46WWw5"
-client_secret = "XjJxSZhHds"
+client_id = PAPAGO_ID
+client_secret = PAPAGO_CLIENT
 
 
 def translate_with_papago(text, source='ko', target='en'):
