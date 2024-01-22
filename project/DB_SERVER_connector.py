@@ -1,5 +1,6 @@
 # 로컬 외부 서버용
 import psycopg2
+from config import DB_PASS
 
 
 def DB_server_connentor():
@@ -8,15 +9,14 @@ def DB_server_connentor():
         'host': '192.168.0.101',  # 데이터베이스 서버의 IP 주소
         'dbname': 'youtube_videos',
         'user': 'psh0826',
-        'password': '15243',
-        'port': 5432 
+        'password': DB_PASS,
+        'port': 5432
     }
 
     # 데이터베이스에 연결
     conn = psycopg2.connect(**db_config)
     cursor = conn.cursor()
     return (conn, cursor)
-
 
 
 # 전체 과정

@@ -1,10 +1,11 @@
 # 우선 db 접속 후 원시 데이터 받기
 import pandas as pd
 from sqlalchemy import create_engine
+from config import DB_PASS
 
 # PostgreSQL 데이터베이스 연결 설정
 username = 'psh0826'  # 사용자 이름
-password = '15243'  # 비밀번호
+password = DB_PASS  # 비밀번호
 host = 'localhost'  # 데이터베이스 서버 주소
 port = '5432'  # 포트 번호
 dbname = 'youtube_videos'  # 데이터베이스 이름
