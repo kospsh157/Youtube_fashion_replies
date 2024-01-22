@@ -56,7 +56,3 @@ def getReply(video_id, api_key):
 
     print('해당 영상의 댓글 총 개수:', len(topReplys))
     return topReplys
-
-
-# API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
-# print(getReply('e4yWqRNVZCo', API_KEY))

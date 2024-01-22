@@ -1,6 +1,9 @@
 import requests
 from DB_injector import inputChannels
 
+from config import GOOGLE_API_2
+from config import GOOGLE_API_1
+
 
 def search_youtube_channels(api_key, query, params):
     base_url = "https://www.googleapis.com/youtube/v3/search"
@@ -100,10 +103,10 @@ def main(api_key, query):
             list.append(channel)
 
     # DB에 삽입
-    inputChannels(list, query)
+    # inputChannels(list, query)
 
 
 if __name__ == "__main__":
-    API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
-    API_KEY2 = 'AIzaSyA4ltLYUhWYUEa3rbevQNCAELquiG-fWPg'
+    API_KEY = GOOGLE_API_1,
+    API_KEY2 = GOOGLE_API_2
     main(API_KEY, '패션')

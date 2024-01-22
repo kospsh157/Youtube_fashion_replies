@@ -26,17 +26,18 @@ channel_ids = ["UCkinYTS9IHqOEwR1Sze2JTw", "UCF8AeLlUbEpKju6v1H6p8Eg", "UCcQTRi6
 # 만약 nextPageToken이게 없다면 해당 응답이 마지막 페이지라는 것이다. 따라서 이걸 이용해서 계속해서 모든 데이터를
 # 받을 때 까지 호출 할수 있다.
 
-# 메인계정
-# API_KEY = 'AIzaSyAMZtdzCRfSJaDwjSHjHpJdHB2x4en0BiM'
 
-# 비빅바
-API_KEY = 'AIzaSyA4ltLYUhWYUEa3rbevQNCAELquiG-fWPg'
+from config import GOOGLE_API_1
+from config import GOOGLE_API_2
+from config import GOOGLE_API_3
+from config import GOOGLE_API_4
 
-# 하마
-# API_KEY = 'AIzaSyA-SXNjsNcNijuLnete6DQLk4X_F7URIis'
+API_KEY = GOOGLE_API_1
+# API_KEY = GOOGLE_API_2
+# API_KEY = GOOGLE_API_3
+# API_KEY = GOOGLE_API_4
 
-# 바밤바
-# API_KEY = 'AIzaSyBQU5HopruqfPu9kqc1XOtEs69O4IEfW7k'
+
 # CHANNEL_ID = 'UCF8AeLlUbEpKju6v1H6p8Eg'  # 원하는 채널의 ID
 # CHANNEL_IDS = ["UCkinYTS9IHqOEwR1Sze2JTw",
 #                "UCF8AeLlUbEpKju6v1H6p8Eg"]  # 여러 채널 ID를 리스트로 추가
@@ -168,14 +169,11 @@ except Exception as e:
     print('로컬 데이터 삽입중에 에러 발생: ', e)
 
 
-
-
 # try:
 #     # 로컬 DB서버에 데이타 삽입
 #     insert_video_data(video_dats_list, query, DB_server_connentor)
 # except Exception as e:
 #     print('DB서버에 데이터 삽입중에 에러 발생: ', e)
-
 
 
 # 주기적으로 함수를 실행하고 그럼 api서버가 따로 있어야 하고 거기서 댓글을 주기적으로 모으고 다시 db서버로 전달한다.

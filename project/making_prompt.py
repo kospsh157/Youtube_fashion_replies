@@ -2,9 +2,13 @@ from openai import OpenAI
 
 # 한글로 약 1000개의 글자당, 0.12불 요금
 
+
+from config import OPEN_API
+
+
 client = OpenAI(
     # defaults to os.environ.get("OPENAI_API_KEY")
-    api_key="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",
+    api_key=OPEN_API
 )
 
 

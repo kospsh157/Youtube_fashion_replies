@@ -5,11 +5,14 @@ import urllib
 from PIL import Image
 from making_prompt import making_prompt
 
+from config import KAKAO_KALRO
+
 # [내 애플리케이션] > [앱 키] 에서 확인한 REST API 키 값 입력
-REST_API_KEY = 'ada696dfddc16d1227e321d7574f06c1'
+# 다음 내 어플리케이션 키
+REST_API_KEY = KAKAO_KALRO
+
 
 # 이미지 생성하기 요청
-
 # 칼로 불용어 설정
 negative_prompt = "news paper, children, old people, elder people, baby, sleeping cat, dog, ugly face, cropped, foods, alphabet, latters, Home Appliances, Electronics, Furniture, Beverages, Tools, \
     Toys, Books, Music items, sports equipment, pet supplies, gardening supplies, artwork, office supplies, building materials, outdoor activity gear"

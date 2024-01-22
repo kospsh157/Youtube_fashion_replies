@@ -1,5 +1,6 @@
 import requests
 
+# 파파고 키
 client_id = "8zyFrQmcAHuJWA46WWw5"
 client_secret = "XjJxSZhHds"
 

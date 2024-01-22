@@ -1,0 +1,8 @@
+*.pt
+*.pht
+*.env
+*.sql
+*.pikle
+*.h5
+*.json
+__pycache__/
