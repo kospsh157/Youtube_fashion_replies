@@ -27,6 +27,7 @@ def making_prompt(tops, bottoms, outers, shoes, accessory):
     result = res1.choices[0].text.strip()
     print(result)
 
+    # result 에서 패션 아이템들이 스타일링되고 prompt_2에서 하드코딩된 프롬프트에 전달된다. 그리고 이대로 이미지봇에 전달된다.
     prompt_2 = f"Please provide a full-length image of a professional fashion model featuring the specified items: {result}, \
         set against an outdoor backdrop. The model should be captured from head to toe,\
           including clearly visible footwear as it's an integral part of the fashion items. \
