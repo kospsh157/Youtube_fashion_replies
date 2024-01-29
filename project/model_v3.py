@@ -158,7 +158,6 @@ with open('vocab.json', 'w') as f:
 # # Okt 토크나이저 초기화 (별도의 상태 저장 필요 없음)
 # okt = Okt()
 
-
 # 모델 평가
 model.eval()
 with torch.no_grad():

@@ -349,12 +349,11 @@ fashion_keywords = lda(unique_comments)
 for topic in fashion_keywords:
     predicted_class = predict(
         topic, fashion_item_classifier_model, text_pipeline)
-
+    # classifier_category 함수를 통해 패션 아이템을 카테고리별로 분류한다. 그리고 분류된 패션 아이템을 gpt로 보낸다.
     top_keywords, bottom_keywords, outer_keywords, shoes_keywords, accessary_keywords, not_fashion_items = classifier_category(
         predicted_class)
 
     print('다음 아래 확인해')
-
     print(top_keywords, bottom_keywords, outer_keywords,
           shoes_keywords, accessary_keywords, not_fashion_items)
 
