@@ -1,3 +1,4 @@
+from gensim.models import CoherenceModel
 from useModel_v3 import predict, fashion_item_classifier_model, text_pipeline, classifier_category
 from making_prompt import making_prompt
 import time
@@ -313,9 +314,14 @@ def lda(comment_list):
     time1 = time.time()
 
     # LDA 모델 학습
+    # 여기서 하이퍼 파라미터 조절
+
+    # 나중에 평가 지표에 따라서 auto 일때랑 비교.
     num_topics = 5
     lda_model = gensim.models.LdaModel(
-        corpus, num_topics=num_topics, id2word=gensim_dictionary, passes=30)
+        alpha='auto',
+        beta='auto',
+        corpus=corpus, num_topics=num_topics, id2word=gensim_dictionary, passes=30)
 
     # 학습된 토픽들 출력
     topics = lda_model.print_topics(num_words=15)
@@ -325,12 +331,29 @@ def lda(comment_list):
     time2 = time.time()
 
     print('걸린시간:', time2 - time1)
+
     words_kr = []
     for idx, topic in topics:
         words_kr.append([word.split('*')[1].replace('"', '').strip()
                         for word in topic.split('+')])
 
-    return words_kr
+    return (words_kr, gensim_dictionary, corpus, lda_model, filtered_temp)
+
+
+def eval_lda(texts, corpus, lda_model, dictionary):
+    # Coherence Model 생성 및 일관성 점수 계산
+    coherence_model = CoherenceModel(
+        model=lda_model, texts=texts, dictionary=dictionary, coherence='c_v')
+    coherence_score = coherence_model.get_coherence()
+
+    print('Coherence Score:', coherence_score)
+
+    # 퍼플렉서티 계산
+    perplexity_score = lda_model.log_perplexity(corpus)
+
+    print('Perplexity:', perplexity_score)
+
+    return coherence_score, perplexity_score
 
 
 def making_img(prompt):
@@ -343,7 +366,15 @@ def making_img(prompt):
 
 # DB에서 긍정적인 댓글로 분류된 댓글들만 가져와서
 # lda를 통해 패션 키워드만 뽑는다.
-fashion_keywords = lda(unique_comments)
+args = lda(unique_comments)
+
+fashion_keywords = args[0]
+# lda[1] 은 평가지표를 사용하기 위한 lda 사전이다. gensim_dictionary
+# lda[2] 은 평가지표를 사용하기 위한 lda 사전이다.  corpus
+# lda[3] 은 평가지표를 사용하기 위한 lda 사전이다.  lda_modal
+# lda[4] 은 평가지표를 사용하기 위한 lda 사전이다.  이게 text
+
+eval_lda(texts=args[4], corpus=args[2], lda_model=args[3], dictionary=args[1])
 
 
 for topic in fashion_keywords:
@@ -361,5 +392,18 @@ for topic in fashion_keywords:
     # for num in range(call_cnt):
     styling_prompt = making_prompt(top_keywords, bottom_keywords,
                                    outer_keywords, shoes_keywords, accessary_keywords)
+
     print('프롬프트: ', styling_prompt)
     making_img(styling_prompt)
+
+
+# 하이퍼파라미터조절 (최적화)
+'''
+1. 문서-토픽 분포
+alpha 
+토픽이 얼마나 균일하게 분포...하는지 -> 낮은 알파값은 몇몇 토픽에만 집중하게함.
+2. 토픽-단어 분포
+beta
+수치가 높을수록 다양한 키워드에 집중. 낮은수록 특정단어에 더 집중
+
+'''
