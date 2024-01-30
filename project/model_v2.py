@@ -374,6 +374,7 @@ fashion_keywords = args[0]
 # lda[3] 은 평가지표를 사용하기 위한 lda 사전이다.  lda_modal
 # lda[4] 은 평가지표를 사용하기 위한 lda 사전이다.  이게 text
 
+print('이 아래 확인')
 eval_lda(texts=args[4], corpus=args[2], lda_model=args[3], dictionary=args[1])
 
 
