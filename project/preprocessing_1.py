@@ -66,10 +66,8 @@ for data in data_list:
     for i, comment in enumerate(data['comments']):
         data['comments'][i] = clean_text(comment).strip()
 
-
 # 48번 인덱스는 모두 타이틀과 댓글이 비어있어서 봤더니 사실 외국 채널이었음 모든것이 러시아 문자라서 빈값 '' 으로 나왔던 거였음.
 # print(data_list[48])
-
 
 # 띄어쓰기 정규화하고 토큰화 진행
 for data in data_list:
@@ -91,7 +89,7 @@ cursor = conn.cursor()
 for data in data_list:
     print(f'{data} 삽입 할 차례 입니다.')
     cursor.execute(
-        "INSERT INTO video_datas_normalized (title, comments) VALUES (%s, %s)",
+        "INSERT INTO video_datas_normalized_1 (title, comments) VALUES (%s, %s)",
         (data["title"], data["comments"])
     )
 

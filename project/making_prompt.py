@@ -2,9 +2,7 @@ from openai import OpenAI
 
 # 한글로 약 1000개의 글자당, 0.12불 요금
 
-
 from config import OPEN_API
-
 
 client = OpenAI(
     # defaults to os.environ.get("OPENAI_API_KEY")
@@ -14,7 +12,7 @@ client = OpenAI(
 
 def making_prompt(tops, bottoms, outers, shoes, accessory):
     res1 = client.completions.create(
-        model="text-davinci-003",
+        model="gpt-3.5-turbo",
         prompt=f"I will provide you with five fashion items: a top ({tops}), bottom ({bottoms}), outerwear ({outers}), shoes ({shoes}), and accessories ({accessory}). \
             Please select one item from each category and devise a contemporary, appealing ensemble with a keen focus on color coordination. \
                 Additionally, based on the chosen fashion items, decide whether a male or female model would best showcase the outfit. \
